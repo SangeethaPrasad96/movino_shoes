@@ -2,6 +2,22 @@
 
 
 
+const loadSignup = async(req,res)=>{
+    
+    try{
+       
+       return res.render("signup")
+
+     
+    } catch(error){
+        console.log('Signup Page not loading:',error)
+        res.status(500).send('Server Error');
+    }
+}
+
+
+
+
 const pageNotFound = async(req,res)=>{
     try{
          res.render("page-404")
@@ -12,7 +28,7 @@ const pageNotFound = async(req,res)=>{
 
 
 
-
+const User = require("../../models/userSchema")
 const loadHomepage = async (req,res)=>{
     try{
         return res.render("home")
@@ -23,8 +39,28 @@ const loadHomepage = async (req,res)=>{
 
 }
 
+const signup = async(req,res)=>{
+    const {name,email,password}= req.body//destructuring
+    try{
+     const newUser = new User({name,email,password})
+     console.log(newUser)
+//saving data to mongodb
+ 
+     await newUser.save();
+
+
+     return res.redirect("/signup")
+    }catch(error){
+     
+        console.error("Error for save user",error)
+        res.status(500).send("Internal server error")
+    }
+}
+
 
 module.exports={
     loadHomepage,
     pageNotFound,
+    loadSignup,
+    signup,
 }

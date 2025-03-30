@@ -2644,7 +2644,8 @@ input[type="button"].btn-block {
   .dropdown-item.active, .dropdown-item:active {
     color: #fff;
     text-decoration: none;
-    background-color: #007bff; }
+    background-color: #007bff;
+   }
   .dropdown-item.disabled, .dropdown-item:disabled {
     color: #6c757d;
     background-color: transparent; }
@@ -7505,7 +7506,7 @@ h1, h2, h3, h4, h5,
         display: -moz-inline-stack;
         display: inline-block;
         zoom: 1;
-        *display: inline;
+        /* *display: inline; */
         -moz-transition: all 0.3s ease;
         -o-transition: all 0.3s ease;
         -webkit-transition: all 0.3s ease;
@@ -8389,12 +8390,12 @@ input[type="text"] {
     display: -moz-inline-stack;
     display: inline-block;
     zoom: 1;
-    *display: inline; }
+    /* *display: inline;  */}
     .colorlib-social-icons li a {
       display: -moz-inline-stack;
       display: inline-block;
       zoom: 1;
-      *display: inline;
+      /* *display: inline; */
       color: #616161;
       padding-left: 10px;
       padding-right: 10px; }
@@ -8844,3 +8845,4 @@ input[type="text"] {
 
 .js .animate-box {
   opacity: 0; }
+
