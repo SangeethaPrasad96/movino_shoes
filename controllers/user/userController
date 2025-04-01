@@ -1,66 +1,219 @@
+const User = require("../../models/userSchema");
+const env = require("dotenv").config();
+const nodemailer = require("nodemailer");
+const bcrypt = require('bcrypt')
 
 
+const loadHomepage = async (req, res) => {
+    try {
+        return res.render("home");
+    } catch (error) {
+        console.log("home page not found"); //backend
+        res.status(500).send('server error'); //frontend
+    }
+};
 
 
-const loadSignup = async(req,res)=>{
-    
-    try{
-       
-       return res.render("signup")
-
-     
-    } catch(error){
-        console.log('Signup Page not loading:',error)
+const loadSignup = async (req, res) => {
+    try {
+        return res.render("signup");
+    } catch (error) {
+        console.log('Signup Page not loading:', error);
         res.status(500).send('Server Error');
     }
+};
+
+//function to generate 0tp
+
+function generateOtp() {
+    return Math.floor(100000 + Math.random() * 900000).toString(); //random 6 digit generation
+
+}
+//defining function
+async function sendVerificationEmail(email,otp) {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            port: 587,
+            secure: false,
+            requireTLS: true,
+            auth: {
+                user: process.env.NODEMAILER_EMAIL,
+                pass: process.env.NODEMAILER_PASSWORD
+            }
+        });
+       
+        const info = await transporter.sendMail({
+            from: process.env.NODEMAILER_EMAIL,
+            to: email,
+            subject: "Verify your account",
+            text: `Your OTP IS ${otp}`,
+            html: `<b>Your OTP: ${otp}</b>`,
+        });
+
+        return info.accepted.length > 0;
+    } catch (error) {
+        console.error("Error sending email", error);
+        return false;
+    }
 }
 
 
+const signup = async (req, res) => {
+
+    try {
+   
+      
+
+        const { name,email, password } = req.body;
+        const cPassword = req.body['confirm-password'];
+        
+       
+         if (password !== cPassword) {
+
+            return res.render("signup", { message: "Passwords do not match" });
+        }
+        //checking the user so for that fetching the user from database
+
+      
+        const findUser = await User.findOne({ email });
+        console.log("👤 User found:", findUser);
+        if (findUser) {
+            return res.render('signup', { message: "User with this email already exists" });
+        }
+
+        //otp generation
+        const otp = generateOtp();
+        console.log("✅ Generated OTP:", otp);
 
 
-const pageNotFound = async(req,res)=>{
-    try{
-         res.render("page-404")
-    }catch(error){
-        res.redirect("/pageNotFound")
+        const emailSent = await sendVerificationEmail(email, otp);
+        console.log("Email Sent Status:", emailSent); 
+
+        if (!emailSent) {
+            console.error("❌ Email sending failed");
+            return res.json("email.error");
+        }
+
+        req.session.userOtp = otp;
+        req.session.userData = { name,email, password };
+
+        res.render("verify-otp"); 
+        console.log("OTP Sent", otp);
+
+    } catch (error) {
+        console.error("signup error", error);
+        res.redirect("/pageNotFound");
+    }
+};
+
+const securePassword = async(password)=>{
+    try {
+        
+        const passwordHash = await bcrypt.hash(password,10)
+
+        return passwordHash;
+
+
+    } catch (error) {
+        
+    }
+}
+
+
+//otp verification
+
+const verifyOtp = async (req,res)=>{
+    try {
+        const {otp}=req.body;
+
+       
+        console.log("Entered OTP:", otp);
+        console.log("Session OTP:", req.session.userOtp)
+
+     if(otp===req.session.userOtp){
+        const user = req.session.userData
+        //secure the password
+        const passwordHash = await securePassword(user.password);
+
+
+        //save user data to database
+        const saveUserData = new User({
+            name:user.name,
+            email:user.email,
+            password:passwordHash,
+
+        })
+
+        await saveUserData.save();
+
+        // Store user ID in session after successful signup
+        req.session.user = saveUserData._id;
+
+
+          // Clear OTP and user data from session after successful verification
+          req.session.userOtp = null;
+          req.session.userData = null;
+
+          // Redirect to homepage
+    return res.json({success:true,redirectUrl:"/"})
+     }else{
+        res.status(400).json({success:false,message:"Invalid OTP,Please try again"})     //invalid otp
+     }
+
+    } catch (error) {
+        console.error("Error verifying OTP",error);
+        res.status(500).json({success:false,message:"An error occured"})
+
+        
+    }
+}
+
+
+//resend otp
+const resendOtp = async (req,res)=>{
+    try {
+        const {email} = req.session.userData;
+        if(!email){
+            return res.status(400).json({success:false,message:"Email not found in session"})
+        }
+
+        const otp = generateOtp();
+        req.session.userOtp = otp;
+
+
+        const emailSent = await sendVerificationEmail(email,otp);
+        if(emailSent){
+            console.log("Resend OTP:",otp)
+            res.status(200).json({success:true,message:"OTP Resend Successfully"})
+        }else{
+            res.status(500).json({success:false,message:"Failed to resend OTP.Please try again"})
+        }
+    } catch (error) {
+        console.error("Error resending OTP",error);
+        res.status(500).json({success:false,message:"Internal Server Error.Please try again"})
     }
 }
 
 
 
-const User = require("../../models/userSchema")
-const loadHomepage = async (req,res)=>{
-    try{
-        return res.render("home")
-    }catch(error){
-        console.log("home page not found")//backend
-        res.status(500).send('server error')//frontend
+
+
+
+
+const pageNotFound = async (req, res) => {
+    try {
+        res.render("page-404");
+    } catch (error) {
+        res.redirect("/pageNotFound");
     }
+};
 
-}
-
-const signup = async(req,res)=>{
-    const {name,email,password}= req.body//destructuring
-    try{
-     const newUser = new User({name,email,password})
-     console.log(newUser)
-//saving data to mongodb
- 
-     await newUser.save();
-
-
-     return res.redirect("/signup")
-    }catch(error){
-     
-        console.error("Error for save user",error)
-        res.status(500).send("Internal server error")
-    }
-}
-
-
-module.exports={
+module.exports = {
     loadHomepage,
     pageNotFound,
     loadSignup,
     signup,
-}
+    verifyOtp,
+    resendOtp,
+};

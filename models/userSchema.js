@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const{Schema }= mongoose;
+const {Schema } = mongoose;
 
 
 const userSchema = new Schema({
@@ -24,6 +24,7 @@ const userSchema = new Schema({
         unique:true,
 
     },
+   
     password:{
         type:String,
         required:false //single signup time not using password
