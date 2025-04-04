@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="en">
 <head>
-    <title>Movino_shoes</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Movino Shoes</title>
     <!-- CSS Links -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet">
@@ -19,7 +19,9 @@
     <link rel="stylesheet" href="css/bootstrap-datepicker.css">
     <link rel="stylesheet" href="fonts/flaticon/font/flaticon.css">
     <link rel="stylesheet" href="css/style.css">
-<!-- header -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexslider/2.7.2/flexslider.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- header -->
     <div class="colorlib-loader"></div>
 
 	<div id="page">
@@ -66,13 +68,13 @@
 			</div>
             <!-- //header -->
     <style>
-        /* Additional Styles */
+        /* Login page styles */
         body, html {
             height: 100%;
             margin: 0;
             font-family: Arial, sans-serif;
         }
-        .signup-wrapper {
+        .login-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -80,7 +82,7 @@
             width: 100%;
             background-color: #f5f5f5;
         }
-        .signup-container {
+        .login-container {
             background: #fff;
             padding: 2rem;
             border-radius: 8px;
@@ -98,7 +100,7 @@
             border-radius: 5px;
             font-size: 16px;
         }
-        .signup-btn {
+        .login-btn {
             width: 100%;
             background-color: #339999;
             color: #fff;
@@ -109,7 +111,7 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        .signup-btn:hover {
+        .login-btn:hover {
             background-color: #2b7d7d;
         }
         .google-btn {
@@ -151,43 +153,37 @@
     </style>
 </head>
 <body>
-    <div class="signup-wrapper">
-        <div class="signup-container">
-            <h2>Create Your Account</h2>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <h2>Login to Your Account</h2>
+            <!-- Google Sign-In Button -->
             <a href="/auth/google" class="google-btn">
                 <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo">
-                Sign Up with Google
+                Log in with Google
             </a>
             <p>or</p>
-            <form id="signform" action="/signup" method="POST">
-                <div class="input-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" required>
-                    <div id="error1" class="error-message"></div>
-                </div>
+            <form action="/login" method="POST">
                 <div class="input-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
-                    <div id="error2" class="error-message"></div>
+                    <div id="error1" class="error-message"></div>
                 </div>
                 <div class="input-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required>
-                    <div id="error3" class="error-message"></div>
-                </div>
-                <div class="input-group">
-                    <label for="confirm-password">Confirm Password</label>
-                    <input type="password" id="confirm-password" name="confirm-password" required>
-                    <div id="error4" class="error-message"></div>
+                   
+                 <div id="error2" class="error-message"></div>
+                 <!-- //alert -->
                 </div>
                 <%if(locals.message && message.length>0){%>
                     <div class="alert alert-danger text-center">
                         <%=message%>
                 </div>
                 <%}%>
-                <button type="submit" class="signup-btn">Create</button>
+                <button type="submit" class="login-btn">Login</button>
             </form>
-            <p>Already have an account? <a href="/login">Log in</a></p>
+            <p><a href="/forgot-password">Forgot Password?</a></p>
+            <p>Don't have an account? <a href="/signup">Create Account</a></p>
         </div>
     </div>
     <!-- Footer -->
@@ -268,107 +264,18 @@
         <a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
     </div>
     <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/jquery.min.js"></script>
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.easing.1.3.js"></script>
-    <script src="js/jquery.waypoints.min.js"></script>
-    <script src="js/jquery.flexslider-min.js"></script>
     <script src="js/owl.carousel.min.js"></script>
     <script src="js/jquery.magnific-popup.min.js"></script>
-    <script src="js/magnific-popup-options.js"></script>
     <script src="js/bootstrap-datepicker.js"></script>
-    <script src="js/jquery.stellar.min.js"></script>
+    <script src="js/jquery.waypoints.min.js"></script>
     <script src="js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flexslider/2.7.2/jquery.flexslider.min.js"></script>
 
-
-    <!-- //validation -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const nameid = document.getElementById("name");
-            const emailid = document.getElementById("email");
-            const passid = document.getElementById("password");
-            const cpassid = document.getElementById("confirm-password");
-
-            const error1 = document.getElementById("error1");
-            const error2 = document.getElementById("error2");
-            const error3 = document.getElementById("error3");
-            const error4 = document.getElementById("error4");
-
-            const signform = document.getElementById("signform");
-
-            function nameValidateChecking() {
-                const nameval = nameid.value;
-                const namepattern = /^[A-Za-z\s]+$/;
-                if (nameval.trim() === "") {
-                    error1.style.display = "block";
-                    error1.innerHTML = "Please enter a valid name";
-                } else if (!namepattern.test(nameval)) {
-                    error1.style.display = "block";
-                    error1.innerHTML = "Name can only contain alphabets and spaces";
-                } else {
-                    error1.style.display = "none";
-                    error1.innerHTML = "";
-                }
-            }
-
-            function emailValidateChecking() {
-                const emailval = emailid.value;
-                const emailpattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                if (!emailpattern.test(emailval)) {
-                    error2.style.display = "block";
-                    error2.innerHTML = "Invalid Format";
-                } else {
-                    error2.style.display = "none";
-                    error2.innerHTML = "";
-                }
-            }
-
-            function passValidateChecking() {
-                const passval = passid.value;
-                const cpassval = cpassid.value;
-                const alpha = /[a-zA-Z]/;
-                const digit = /\d/;
-
-                if (passval.length < 8) {
-                    error3.style.display = "block";
-                    error3.innerHTML = "Should contain at least 8 characters";
-                } else if (!alpha.test(passval) || !digit.test(passval)) {
-                    error3.style.display = "block";
-                    error3.innerHTML = "Should contain numbers and alphabets";
-                } else {
-                    error3.style.display = "none";
-                    error3.innerHTML = "";
-                }
-
-                if (passval !== cpassval) {
-                    error4.style.display = "block";
-                    error4.innerHTML = "Passwords do not match";
-                } else {
-                    error4.style.display = "none";
-                    error4.innerHTML = "";
-                }
-            }
-
-            nameid.addEventListener("input", nameValidateChecking);
-            emailid.addEventListener("input", emailValidateChecking);
-            passid.addEventListener("input", passValidateChecking);
-            cpassid.addEventListener("input", passValidateChecking);
-
-            signform.addEventListener("submit", function (e) {
-                nameValidateChecking();
-                emailValidateChecking();
-                passValidateChecking();
-
-                if (!nameid || !emailid || !passid || !cpassid || !error1 || !error2 || !error3 || !error4 || !signform) {
-                    console.error("One or more elements not found");
-                }
-
-                if (error1.innerHTML || error2.innerHTML || error3.innerHTML || error4.innerHTML) {
-                    e.preventDefault();
-                }
-            });
-        });
-    </script>
+    
 </body>
 </html>
+

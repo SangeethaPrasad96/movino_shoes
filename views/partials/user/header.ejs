@@ -37,6 +37,62 @@
 	<link rel="stylesheet" href="css/style.css">
 
 	</head>
+
+	<style>
+	/* Dropdown Container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+}
+
+/* Dropdown Button (Trigger) */
+.sign-in-link {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 15px;
+    background: #333; /* Dark theme background */
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+.sign-in-link:hover {
+    background: #555;
+}
+
+/* Dropdown Content */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #222; /* Dark dropdown background */
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Dropdown Links */
+.dropdown-content a {
+    color: #fff;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    transition: all 0.3s ease-in-out;
+}
+
+.dropdown-content a:hover {
+    background-color: #444; /* Slightly lighter for hover */
+}
+
+/* Show Dropdown on Hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+</style>
 	<body>
 		
 	<div class="colorlib-loader"></div>
@@ -76,7 +132,36 @@
 								<li><a href="about.html">About</a></li>
 								<li><a href="contact.html">Contact</a></li>
 								<li class="cart"><a href="cart.html"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
-								<li><a href="/login">Login</a></li>
+<!-- //header style dropdown -->
+								<!-- <%if(locals.user){%>
+                                  <div class = " dropdown">
+									<a href="#" class="sign-in-link"><%=locals.user.name%</a>
+									<div class = "dropdown-content">
+
+										<a href ="/userProfile">Profile</a>
+										<a href ="/logout">Logout</a>
+									</div>
+
+								  </div>
+                               <%}else{%>
+
+								<a href ="/signup" class="sign-in-link">Sign Up</a>
+								<a href = "/login" class="sign-in-link">Log in</a>
+								<%}%> -->
+								<% if (locals.user) { %>
+									<div class="dropdown">
+										<a href="#" class="sign-in-link"><%= locals.user.name %></a>
+										<div class="dropdown-content">
+											<a href="/userProfile">Profile</a>
+											<a href="/logout">Logout</a>
+										</div>
+									</div>
+								<% } else { %>
+									<a href="/signup" class="sign-in-link">Sign Up</a>
+									<a href="/login" class="sign-in-link">Log in</a>
+								<% } %>
+								
+							<li><a href="/login">Login</a></li>
 								<li><a href="/signup">Signup</a></li>
 							</ul>
 						</div>
