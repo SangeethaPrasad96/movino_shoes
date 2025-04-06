@@ -26,19 +26,7 @@
             font-size: 24px;
             font-family: 'Trebuchet MS', sans-serif;
         }
-        .search-bar {
-            display: flex;
-            align-items: center;
-            width: 60%;
-        }
-        .search-bar input {
-            padding: 12px;
-            width: 100%;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-            font-family: 'Segoe UI', sans-serif;
-        }
+       
         .admin-avatar {
             display: flex;
             align-items: center;
@@ -65,13 +53,19 @@
             text-align: center;
             margin-bottom: 20px;
         }
+       
         .menu-item {
             padding: 10px 20px;
-            border-bottom: 1px solid #d3d3d3;
+            border-bottom: 1px solid #d3d3d3; /* ash line */
             cursor: pointer;
         }
+        .menu-item a {
+            text-decoration: none;
+            color: black;
+            display: block;
+        }
         .menu-item:hover {
-            background-color: #ddd;
+            background-color: #339999;
         }
         .main-content {
             margin-left: 250px;
@@ -114,25 +108,25 @@
 <body>
     <div class="navbar-top">
         <h1>DashMovino</h1>
-        <div class="search-bar">
-            <input type="text" placeholder="Search...">
-        </div>
+        
         <div class="admin-avatar">
             <img src="/admin-assets/imgs/people/avatar2.jpg" alt="Admin" title="Admin Profile">
         </div>
     </div>
-    <div class="sidebar">
-        <div class="menu-item">Dashboard</div>
-        <div class="menu-item">Customers</div>
-        <div class="menu-item">Category</div>
-        <div class="menu-item">Brands</div>
-        <div class="menu-item">Add Product</div>
-        <div class="menu-item">Products</div>
-        <div class="menu-item">Coupon</div>
-        <div class="menu-item">Banner</div>
-        <div class="menu-item">Orders</div>
-       <button class="logout-btn" id="logoutBtn">Logout</button>
-    </div>
+   
+        <div class="sidebar">
+            <div class="menu-item"><a href="/admin/">Dashboard</a></div>
+            <div class="menu-item"><a href="/admin/users">Customers</a></div>
+            <div class="menu-item"><a href="/admin/categories">Category</a></div>
+            <div class="menu-item"><a href="/admin/brands">Brands</a></div>
+            <div class="menu-item"><a href="/admin/add-product">Add Product</a></div>
+            <div class="menu-item"><a href="/admin/products">Products</a></div>
+            <div class="menu-item"><a href="/admin/coupons">Coupon</a></div>
+            <div class="menu-item"><a href="/admin/banners">Banner</a></div>
+            <div class="menu-item"><a href="/admin/orders">Orders</a></div>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+     
     <div class="main-content">
         <h2>Error Page</h2>
         <p>An error occurred while processing your request.</p>

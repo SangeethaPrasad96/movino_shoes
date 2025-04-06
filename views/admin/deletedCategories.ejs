@@ -1,0 +1,56 @@
+<%- include("../../views/partials/admin/header") %>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow p-4">
+        <h3 class="mb-4 text-center">Deleted Categories</h3>
+
+        <div class="text-end mb-3">
+          <a href="/admin/categories" class="btn btn-secondary">← Back to Category List</a>
+        </div>
+
+        <table class="table table-bordered text-center align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>SL No.</th>
+              <th>Category</th>
+              <th>Subcategory</th>
+              <th>Image</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (deletedCategories.length === 0) { %>
+              <tr>
+                <td colspan="6">No deleted categories.</td>
+              </tr>
+            <% } else { %>
+              <% deletedCategories.forEach((cat, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= cat.categoryName %></td>
+                  <td><%= cat.subCategory %></td>
+                  <td>
+                    <% if (cat.image) { %>
+                      <img src="/uploads/<%= cat.image %>" alt="Category Image" width="80" height="50" class="img-fluid rounded" />
+                    <% } else { %>
+                      No Image
+                    <% } %>
+                  </td>
+                  <td><span class="badge bg-danger">Deleted</span></td>
+                  <td>
+                    <a href="/admin/categories/recover/<%= cat._id %>" class="btn btn-success btn-sm">Recover</a>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("../../views/partials/admin/footer") %>

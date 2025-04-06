@@ -55,10 +55,13 @@ const userSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:"Order"
     }],
-    createdOn:{
-        type:Date,
-        default:Date.now,
-    },
+    // createdOn:{
+    //     type:Date,
+    //     default:Date.now,
+    // },
+
+
+    
     //referral code to new user
     // referalCode:{
     //     type:String,
@@ -88,7 +91,7 @@ const userSchema = new Schema({
 
 
     }]
-})
+}, { timestamps: true }) ; // ✅ this adds createdAt and updatedAt automatically
 
 
 

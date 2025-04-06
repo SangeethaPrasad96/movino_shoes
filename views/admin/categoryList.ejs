@@ -1,0 +1,70 @@
+
+<%- include("../../views/partials/admin/header") %>
+<div class="container mt-5">
+  <div class="d-flex justify-content-between mb-3">
+    <form class="d-flex" action="/admin/categories/search" method="GET">
+      <input type="text" name="search" class="form-control me-2" placeholder="Search by category..." value="<%= searchQuery || '' %>">
+      <button type="submit" class="btn btn-primary me-2">Search</button>
+      <a href="/admin/categories" class="btn btn-secondary">Reset</a>
+    </form>
+
+    <div>
+      <a href="/admin/categories/add" class="btn btn-success">Add Category</a>
+      <a href="/admin/categories/deleted" class="btn btn-danger">Deleted Categories</a>
+    </div>
+  </div>
+
+  <table class="table table-bordered text-center">
+    <thead class="table-dark">
+      <tr>
+        <th>SL No.</th>
+        <th>Category</th>
+        <th>Subcategory</th>
+        <th>Image</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (categories.length === 0) { %>
+        <tr><td colspan="6">No categories found.</td></tr>
+      <% } else { %>
+        <% categories.forEach((cat, index) => { %>
+          <tr>
+            <td><%= index + 1 + ((currentPage - 1) * limit) %></td>
+            <td><%= cat.categoryName %></td>
+            <td><%= cat.subCategory %></td>
+            <td><img src="/uploads/<%= cat.image %>" width="80" height="50"></td>
+            <td>
+              <% if (cat.isDeleted) { %>
+                <span class="badge bg-danger">Deleted</span>
+              <% } else { %>
+                <span class="badge bg-success">Active</span>
+              <% } %>
+            </td>
+            <td>
+              <a href="/admin/categories/edit/<%= cat._id %>" class="btn btn-warning btn-sm">Edit</a>
+              <% if (!cat.isDeleted) { %>
+                <a href="/admin/categories/delete/<%= cat._id %>" class="btn btn-danger btn-sm">Delete</a>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <nav>
+    <ul class="pagination justify-content-center">
+      <% for(let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+</div>
+
+
+<%- include("../../views/partials/admin/footer") %>

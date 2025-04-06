@@ -1,0 +1,45 @@
+<%- include("../../views/partials/admin/header") %>
+
+<div class="d-flex" style="min-height: 100vh;">
+  <main class="flex-grow-1 d-flex justify-content-center align-items-center" style="background-color: #f9f9f9;">
+    <div class="container" style="max-width: 600px; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <h2 class="text-center mb-4">Edit Category</h2>
+
+      <form action="/admin/categories/edit/<%= category._id %>" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label for="categoryName" class="form-label">Category (Men/Women)</label>
+          <select class="form-control" name="categoryName" required>
+            <option value="Men" <%= category.categoryName === 'Men' ? 'selected' : '' %>>Men</option>
+            <option value="Women" <%= category.categoryName === 'Women' ? 'selected' : '' %>>Women</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="subCategory" class="form-label">Subcategory</label>
+          <select class="form-control" name="subCategory" required>
+            <option value="Sports" <%= category.subCategory === 'Sports' ? 'selected' : '' %>>Sports</option>
+            <option value="Casual" <%= category.subCategory === 'Casual' ? 'selected' : '' %>>Casual</option>
+            <option value="Formal" <%= category.subCategory === 'Formal' ? 'selected' : '' %>>Formal</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Current Image</label><br />
+          <img src="/uploads/<%= category.image %>" alt="Category Image" width="150" height="100">
+        </div>
+
+        <div class="mb-3">
+          <label for="image" class="form-label">Change Image (optional)</label>
+          <input class="form-control" type="file" name="image" accept="image/*" />
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-success">Update</button>
+          <a href="/admin/categories" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+
+<%- include("../../views/partials/admin/footer") %>
