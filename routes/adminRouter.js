@@ -3,12 +3,21 @@ const router = express.Router();
 const adminController = require('../controllers/admin/adminController');
 const customerController = require("../controllers/admin/customerController")
 const categoryController = require("../controllers/admin/categoryController");
+const productController = require("../controllers/admin/productController");
+
+
 const {userAuth,adminAuth} = require("../middlewares/auth")
 const Category = require("../models/categorySchema");
+const Product = require("../models/productSchema");
 
 
-const multer = require("multer");
-const path = require("path");
+const upload = require('../middlewares/multer');
+const resizeProductImages = require('../middlewares/imageResize');
+
+
+
+// const multer = require("multer");
+// const path = require("path");
 
 //============Admin Auth ===============
 router.get("/pageerror",adminController.pageerror)
@@ -29,15 +38,15 @@ router.patch("/users/:id/block", customerController.toggleBlockUser);
 
 
 // Setup multer for file upload
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, "public/uploads/");
-    },
-    filename: function (req, file, cb) {
-      cb(null, Date.now() + path.extname(file.originalname));
-    },
-  });
-  const upload = multer({ storage });
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, "public/uploads/categories");
+//     },
+//     filename: function (req, file, cb) {
+//       cb(null, Date.now() + path.extname(file.originalname));
+//     },
+//   });
+//   const upload = multer({ storage });
 
 
 
@@ -75,6 +84,37 @@ router.get('/categories/deleted',adminAuth, async (req, res) => {
   });
   
 
+//================== Product Management ==================//
+// Show form to add product
+router.get('/products/add', adminAuth, productController.getAddProductForm);
 
+// Handle product creation
+router.post('/products/add', adminAuth, upload.array('images', 5), resizeProductImages, productController.postAddProduct);
+
+// List active products
+router.get('/products', adminAuth, productController.getAllProducts);
+
+// Soft delete a product
+router.get('/products/delete/:id', adminAuth, productController.softDeleteProduct);
+
+// Edit product form
+router.get('/products/edit/:id', adminAuth, productController.editProductForm);
+
+// Handle edit post
+router.post('/products/edit/:id', adminAuth, upload.array('images', 5), resizeProductImages, productController.updateProduct);
+
+// View deleted products
+router.get('/products/deleted', adminAuth, productController.viewDeletedProducts);
+
+// Recover soft-deleted product
+router.post('/products/recover/:id', adminAuth, productController.recoverProduct);
+
+//================== Testing Route ==================//
+router.post('/test-upload', upload.array('images', 5), resizeProductImages, (req, res) => {
+  res.json({
+    message: 'Images uploaded and resized successfully!',
+    resizedImages: req.body.images
+  });
+});
 
 module.exports = router;

@@ -43,7 +43,7 @@
                             <td><%= (currentPage - 1) * limit + index + 1 %></td>
                             <td>
                                 <% if (cat.image) { %>
-                                    <img src="/uploads/<%= cat.image %>" alt="Category Image" width="60">
+                                    <img src="/uploads/categories/<%= cat.image %>" alt="Category Image" width="60">
                                 <% } else { %>
                                     <span class="text-muted">No image</span>
                                 <% } %>

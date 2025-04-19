@@ -2,26 +2,31 @@ const User = require("../../models/userSchema");
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require('bcrypt')
+const Product = require('../../models/productSchema'); 
 
+const Category = require('../../models/categorySchema');
 
 
 
 
 const loadHomepage = async (req, res) => {
     try {
-        const user = req.session.user; // Retrieve user details from session
-        if(user) {
-            const userData = await User.findOne({_id: user._id}); // Fetch full user data from the database
-            return res.render("home", { user: userData }); // Pass user data to the frontend (EJS)
+        const user = req.session.user;
+
+        // Fetch 6 latest active products
+        const products = await Product.find({ isDeleted: false }).limit(6);
+
+        if (user) {
+            const userData = await User.findOne({ _id: user._id });
+            return res.render("home", { user: userData, products }); // Pass products here
         } else {
-            return res.render('home', { user: null }); // If no user is logged in, pass null for user
+            return res.render('home', { user: null, products }); // Also pass products when no user
         }
     } catch (error) {
         console.log("Error in loading homepage:", error);
-        res.status(500).send('Server error'); // In case of an error
+        res.status(500).send('Server error');
     }
 };
-
 
 
 
@@ -168,7 +173,8 @@ const verifyOtp = async (req,res)=>{
  
     //       // Redirect to homepage
    
-    return res.json({success:true,redirectUrl:"/"})
+    return res.json({success:true,redirectUrl:"/login"})
+    // return res.redirect('/login');
      }else{
         res.status(400).json({success:false,message:"Invalid OTP,Please try again"})     //invalid otp
      }
@@ -235,36 +241,6 @@ const pageNotFound = async (req, res) => {
 
 
 
-// const login = async (req,res)=>{
-//     try {
-//         const{email,password}=req.body;
-//         const findUser = await User.findOne({isAdmin:0,email:email});
-
-//         if(!findUser){
-//             return res.render("login",{message:"User not found"})
-
-//         }
-//         if(findUser.isBlocked){
-//             return res.render("login",{message:"User is blocked by admin"})
-//         }
-
-//         const passwordMatch = await bcrypt.compare(password,findUser.password)
-
-//         if(!passwordMatch){
-//             return res.render("login",{message:"Incorrect Password"})
-//         }
-
-//         req.session.user = findUser._id;
-//         res.redirect("/")
-
-
-//     } catch (error) {
-
-//         console.error("login error",error);
-//         res.render("login",{message:"login failed try again later"})
-        
-//     }
-// }
 
 const login = async (req, res) => {
     try {
@@ -303,6 +279,140 @@ const logout = (req, res) => {
     });
 };
 
+
+
+const getShopPage = async (req, res) => {
+  try {
+    // Get filter parameters from query string
+    const query = req.query.query || '';
+    const sort = req.query.sort || '';
+    const selectedCategory = req.query.category || '';
+    const selectedSubCategory = req.query.subCategory || '';
+    const priceMin = req.query.priceMin ? Number(req.query.priceMin) : '';
+    const priceMax = req.query.priceMax ? Number(req.query.priceMax) : '';
+    
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 4; // Products per page
+    const skip = (page - 1) * limit;
+    
+    // Build the query object for MongoDB
+    const filterQuery = {};
+    
+    // Text search if query parameter exists
+    if (query) {
+      filterQuery.$or = [
+        { name: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } }
+      ];
+    }
+    
+    // Category filter
+    if (selectedCategory) {
+      filterQuery.category = selectedCategory;
+    }
+    
+    // Subcategory filter
+    if (selectedSubCategory) {
+      filterQuery.subCategory = selectedSubCategory;
+    }
+    
+    // Price range filter
+    if (priceMin !== '' || priceMax !== '') {
+      filterQuery.price = {};
+      
+      if (priceMin !== '') {
+        filterQuery.price.$gte = priceMin;
+      }
+      
+      if (priceMax !== '') {
+        filterQuery.price.$lte = priceMax;
+      }
+    }
+    
+    // Build sort options
+    let sortOptions = {};
+    
+    switch (sort) {
+      case 'low-to-high':
+        sortOptions = { price: 1 };
+        break;
+      case 'high-to-low':
+        sortOptions = { price: -1 };
+        break;
+      case 'a-z':
+        sortOptions = { name: 1 };
+        break;
+      case 'z-a':
+        sortOptions = { name: -1 };
+        break;
+      default:
+        // Default sort (e.g., by createdAt)
+        sortOptions = { createdAt: -1 };
+    }
+    
+    // Count total matching products for pagination
+    const totalProducts = await Product.countDocuments(filterQuery);
+    const totalPages = Math.ceil(totalProducts / limit);
+    
+    // Fetch products with filters and pagination applied
+    const products = await Product.find(filterQuery)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit)
+      .populate('category')
+      .lean();
+    
+    // Fetch all categories for the filter dropdowns
+    // const categories = await Category.find({}).lean();
+    const categories = await Category.find({ status: 'listed' }).lean();
+    
+    // Render shop page with data
+    res.render('shop', {
+      title: 'Shop',
+      products,
+      categories,
+      query,
+      sort,
+      selectedCategory,
+      selectedSubCategory,
+      priceMin,
+      priceMax,
+      // Pagination data
+      currentPage: page,
+      totalPages,
+      totalProducts,
+      // Pass categories as JSON string for client-side JS
+      categoriesJson: JSON.stringify(categories)
+    });
+  } catch (error) {
+    console.error('Shop page error:', error);
+    res.status(500).render('error', {
+      message: 'An error occurred while loading the shop page'
+    });
+  }
+};
+
+const getProductDetail = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findById(productId).lean();
+
+    if (!product) {
+      return res.status(404).render('404', { message: 'Product not found' });
+    }
+
+    res.render('product-detail', { product });
+  } catch (err) {
+    console.error("Error fetching product:", err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+
+
+
 module.exports = {
     loadHomepage,
     pageNotFound,
@@ -313,4 +423,6 @@ module.exports = {
     loadLogin,
     login,
     logout,
+    getShopPage,
+    getProductDetail,
 };

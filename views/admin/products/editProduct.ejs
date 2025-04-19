@@ -1,0 +1,200 @@
+
+
+
+<%- include("../../views/partials/admin/header") %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="d-flex justify-content-center align-items-start" style="min-height: 100vh; padding-top: 80px;">
+  <div class="w-100" style="max-width: 800px;">
+    <h3 class="text-center mb-4">Edit Product</h3>
+    
+    <form id="editProductForm" action="/admin/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
+      
+      <!-- Product Name -->
+      <div class="mb-3">
+        <label>Product Name</label>
+        <input type="text" name="name" value="<%= product.name %>" class="form-control" required>
+      </div>
+
+      <!-- Category and Subcategory -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label>Category</label>
+          <select name="category" class="form-control" required>
+            <option value="">-- Select Category --</option>
+            <option value="Men" <%= product.category === 'Men' ? 'selected' : '' %>>Men</option>
+            <option value="Women" <%= product.category === 'Women' ? 'selected' : '' %>>Women</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label>Subcategory</label>
+          <select name="subcategory" class="form-control" required>
+            <option value="">-- Select Subcategory --</option>
+            <option value="Formal" <%= product.subcategory === 'Formal' ? 'selected' : '' %>>Formal</option>
+            <option value="Casual" <%= product.subcategory === 'Casual' ? 'selected' : '' %>>Casual</option>
+            <option value="Sports" <%= product.subcategory === 'Sports' ? 'selected' : '' %>>Sports</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Price and Stock -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label>Price (₹)</label>
+          <input type="number" name="price" value="<%= product.price %>" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label>Stock</label>
+          <input type="number" name="stock" value="<%= product.stock %>" class="form-control" min="0" required>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <label>Description</label>
+        <textarea name="description" class="form-control" required><%= product.description %></textarea>
+      </div>
+
+      <!-- Current Images -->
+      <div class="mb-3">
+        <!-- <label>Current Images:</label><br>
+        <% if (product.images && product.images.length > 0) { %>
+          <div class="d-flex flex-wrap">
+            <% product.images.forEach(img => { %>
+              <img src="/uploads/<%= img %>" width="80" height="60" class="m-1 rounded shadow-sm" style="object-fit: cover;">
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p>No images available.</p>
+        <% } %> -->
+
+        <label>Current Images:</label><br>
+<% if (product.images && product.images.length > 0) { %>
+  <% product.images.forEach(function(image) { %>
+    <img src="/uploads/<%= image %>" alt="Product Image" width="100" height="100" style="margin-right: 10px;" />
+  <% }); %>
+<% } else { %>
+  <p>No images available</p>
+<% } %>
+
+      </div>
+
+      <!-- Upload New Images -->
+      <div class="mb-3">
+        <label>Upload New Images (Min 3 to replace all)</label>
+        <input type="file" name="images" id="imagesInput" multiple class="form-control" accept="image/*">
+      </div>
+
+      <!-- Preview New Images -->
+      <div id="newImagePreview" class="d-flex flex-wrap mb-3"></div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">Update Product</button>
+        <a href="/admin/products" class="btn btn-secondary">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- <script>
+  const imageInput = document.getElementById('imagesInput');
+  const previewDiv = document.getElementById('newImagePreview');
+  const form = document.getElementById('editProductForm');
+
+  imageInput.addEventListener('change', () => {
+    previewDiv.innerHTML = '';
+    const files = Array.from(imageInput.files);
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.classList.add('me-2', 'mb-2');
+        img.style.height = '60px';
+        img.style.width = '60px';
+        img.style.objectFit = 'cover';
+        img.style.border = '1px solid #ccc';
+        img.style.borderRadius = '5px';
+        previewDiv.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  form.addEventListener('submit', function(e) {
+    const files = imageInput.files;
+    if (files.length > 0 && files.length < 3) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Minimum 3 Images Required',
+        text: 'Please upload at least 3 images to replace existing ones.',
+      });
+    }
+  });
+</script> -->
+
+<script>
+  const imageInput = document.getElementById('imagesInput');
+  const previewDiv = document.getElementById('newImagePreview');
+  const form = document.getElementById('editProductForm');
+
+  // Show previews of newly selected images
+  imageInput.addEventListener('change', () => {
+    previewDiv.innerHTML = '';
+    const files = Array.from(imageInput.files);
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.classList.add('me-2', 'mb-2');
+        img.style.height = '60px';
+        img.style.width = '60px';
+        img.style.objectFit = 'cover';
+        img.style.border = '1px solid #ccc';
+        img.style.borderRadius = '5px';
+        previewDiv.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // On form submit, validate if 3+ new images selected
+  form.addEventListener('submit', function(e) {
+    const files = imageInput.files;
+    if (files.length > 0 && files.length < 3) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Minimum 3 Images Required',
+        text: 'Please upload at least 3 images to replace existing ones.',
+      });
+    }
+  });
+
+  // Handle query string error from backend redirect
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('error') === 'minImages') {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Minimum 3 Images Required',
+      text: 'Please upload at least 3 images to replace existing ones.',
+    });
+  }
+
+  if (urlParams.get('exists') === 'true') {
+    Swal.fire({
+      icon: 'error',
+      title: 'Product Name Already Exists',
+      text: 'Please use a different name.',
+    });
+  }
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

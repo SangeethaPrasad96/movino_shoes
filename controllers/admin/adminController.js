@@ -27,17 +27,20 @@ const login = async (req,res)=>{
 
 
         if(admin){
-            const passwordMatch = bcrypt.compare(password,admin.password)//comparing the password
+            const passwordMatch = await bcrypt.compare(password,admin.password)//comparing the password
             if(passwordMatch){
-                req.session.admin = true;
+                // req.session.admin = true;
+                req.session.admin = admin._id;
                 return res.redirect('/admin')
             }else {
-                return res.redirect('/login')
+                // return res.redirect('/login')
+                return res.render('admin-login', { message: 'Invalid credentials' });
             
 
             }
         }else{
-            return res.redirect('/login')
+            // return res.redirect('/login')
+            return res.render('admin-login', { message: 'Admin not found' });
         }
     } catch (error) {
         console.log("login error",error)

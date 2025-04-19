@@ -76,22 +76,22 @@ const userSchema = new Schema({
     //     ref:"User"
     // }],
     //after sorting pdt picking//sorting category and brand wise
-    searchHistory:[{
-        category:{
-            type:Schema.Types.ObjectId,
-            ref:"Category",
-        },
-        brand:{
-            type: String
-        },
-        searchOn:{
-            type:Date,
-            default:Date.now
-        }
+    // searchHistory:[{
+    //     category:{
+    //         type:Schema.Types.ObjectId,
+    //         ref:"Category",
+    //     },
+    //     brand:{
+    //         type: String
+    //     },
+    //     searchOn:{
+    //         type:Date,
+    //         default:Date.now
+    //     }
 
 
-    }]
-}, { timestamps: true }) ; // ✅ this adds createdAt and updatedAt automatically
+    // }]
+}, { timestamps: true }) ; // this adds createdAt and updatedAt automatically
 
 
 

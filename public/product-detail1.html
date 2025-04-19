@@ -7,6 +7,10 @@
 
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+
+    
 	
 	<!-- Animate.css -->
 	<link rel="stylesheet" href="css/animate.css">
@@ -34,6 +38,8 @@
 
 	<!-- Theme style  -->
 	<link rel="stylesheet" href="css/style.css">
+   
+
 
 	</head>
 	<body>
@@ -123,28 +129,32 @@
 							<div class="item">
 								<div class="product-entry border">
 									<a href="#" class="prod-img">
-										<img src="images/item-1.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+										<!-- <img src="images/item-1.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template"> -->
+										<img src="/uploads/products/<%= product.images[0] %>" class="img-fluid" alt="<%= product.name %>">
 									</a>
 								</div>
 							</div>
 							<div class="item">
 								<div class="product-entry border">
 									<a href="#" class="prod-img">
-										<img src="images/item-2.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+										<!-- <img src="images/item-2.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template"> -->
+										<img src="/uploads/products/<%= product.images[1] %>" class="img-fluid" alt="<%= product.name %>">
 									</a>
 								</div>
 							</div>
 							<div class="item">
 								<div class="product-entry border">
 									<a href="#" class="prod-img">
-										<img src="images/item-3.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+										<!-- <img src="images/item-3.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template"> -->
+										<img src="/uploads/products/<%= product.images[2] %>" class="img-fluid" alt="<%= product.name %>">
 									</a>
 								</div>
 							</div>
 							<div class="item">
 								<div class="product-entry border">
 									<a href="#" class="prod-img">
-										<img src="images/item-4.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+										<!-- <img src="images/item-4.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template"> -->
+										<img src="/uploads/products/<%= product.images[3] %>" class="img-fluid" alt="<%= product.name %>">
 									</a>
 								</div>
 							</div>
@@ -152,9 +162,12 @@
 					</div>
 					<div class="col-sm-4">
 						<div class="product-desc">
-							<h3>Women's Boots Shoes Maca</h3>
+							<!-- <h3>Women's Boots Shoes Maca</h3> -->
+							<h3><%= product.name %> - Product Details</h3>
 							<p class="price">
-								<span>$68.00</span> 
+								<p>Price: ₹<%= product.price %></p>
+								<!-- <span>$68.00</span>  -->
+								
 								<span class="rate">
 									<i class="icon-star-full"></i>
 									<i class="icon-star-full"></i>
@@ -164,7 +177,8 @@
 									(74 Rating)
 								</span>
 							</p>
-							<p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.</p>
+							<p>Description: <%= product.description %></p>
+							<!-- <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.</p> -->
 							<div class="size-wrap">
 								<div class="block-26 mb-2">
 									<h4>Size</h4>
@@ -535,4 +549,3 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 
 	</body>
 </html>
-

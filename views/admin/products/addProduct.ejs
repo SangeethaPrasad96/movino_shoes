@@ -1,0 +1,154 @@
+<%- include("../../views/partials/admin/header") %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+<div style="min-height: 80vh;" class="d-flex justify-content-center align-items-center">
+  <div class="container" style="max-width: 600px;">
+    <h3 class="text-center mb-4">Add Product</h3>
+    <form action="/admin/products/add" method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label>Product Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+
+<!-- Description Field -->
+<div class="form-group">
+  <label for="description">Description</label>
+  <textarea name="description" id="description" class="form-control" rows="3" required></textarea>
+</div>
+
+<!-- Stock Field -->
+<div class="form-group">
+  <label for="stock">Stock</label>
+  <input type="number" name="stock" id="stock" class="form-control" min="0" required />
+</div>
+
+
+
+      <div class="mb-3">
+        <label>Category</label>
+        <select name="category" class="form-select" required>
+          <option value="">-- Select Category --</option>
+          <option value="Men">Men</option>
+          <option value="Women">Women</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label>Subcategory</label>
+        <select name="subcategory" class="form-select" required>
+          <option value="">-- Select Subcategory --</option>
+          <option value="Formal">Formal</option>
+          <option value="Casual">Casual</option>
+          <option value="Sports">Sports</option>
+        </select>
+      </div>
+
+      <!-- <div class="mb-3">
+        <label>Price</label>
+        <input type="number" name="price" class="form-control" required>
+      </div> -->
+      <div class="mb-3">
+        <label>Price</label>
+        <div class="input-group">
+          <!-- <span class="input-group-text">₹</span> -->
+          <input type="number" name="price" class="form-control"  required>
+        </div>
+      </div>
+      
+      <div class="mb-3">
+        <label>Images (Min 3)</label>
+        <!-- <input type="file" name="images[]" class="form-control" multiple accept="image/*" required> -->
+        <input type="file" name="images" class="form-control" multiple accept="image/*" required>
+
+      </div>
+      <!-- <div id="imagePreview" class="d-flex flex-wrap"></div> -->
+      <div id="imagePreview" class="d-flex flex-wrap mt-2"></div>
+
+      <button type="submit" class="btn btn-success w-100">Add Product</button>
+    </form>
+  </div>
+</div>
+
+
+
+
+<script>
+  const imageInput = document.querySelector('input[name="images"]');
+  const imagePreview = document.getElementById('imagePreview');
+  const form = document.querySelector('form');
+
+  imageInput.addEventListener('change', function () {
+    imagePreview.innerHTML = ''; // Clear preview
+
+    const files = Array.from(this.files);
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.classList.add('me-2', 'mb-2');
+        img.style.height = '60px';
+        img.style.width = '60px';
+        img.style.objectFit = 'cover';
+        img.style.border = '1px solid #ccc';
+        img.style.borderRadius = '5px';
+        imagePreview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // form.addEventListener('submit', function (e) {
+  //   const files = imageInput.files;
+  //   if (files.length < 3) {
+  //     e.preventDefault();
+  //     alert('Please upload at least 3 images.');
+  //   }
+  // });
+
+  form.addEventListener('submit', function (e) {
+    const files = imageInput.files;
+
+    if (files.length < 3) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'error',
+        title: 'Minimum 3 Images Required',
+        text: 'Please upload at least 3 product images.'
+      });
+      return;
+    }
+
+    const name = form.querySelector('input[name="name"]').value.trim();
+    const description = form.querySelector('textarea[name="description"]').value.trim();
+    const price = form.querySelector('input[name="price"]').value.trim();
+    const stock = form.querySelector('input[name="stock"]').value.trim();
+
+    if (!name || !description || !price || !stock) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Validation Error',
+        text: 'Please fill all required fields.'
+      });
+      return;
+    }
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('exists') === 'true') {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Product Already Exists',
+      text: 'Please try with another name.',
+    });
+  }
+
+  
+</script>
+
+
+<%- include("../../views/partials/admin/footer") %>

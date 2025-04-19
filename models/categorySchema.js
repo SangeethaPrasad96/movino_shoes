@@ -49,6 +49,11 @@ const categorySchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    status: {
+      type: String,
+      enum: ['listed', 'unlisted'],  // For listed and unlisted status
+      default: 'listed',  // Default to 'listed'
+    },
   },
   { timestamps: true } // for createdAt and updatedAt
 );
