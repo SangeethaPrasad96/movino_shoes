@@ -9,12 +9,15 @@ const adminRouter = require('./routes/adminRouter')
 const flash = require('connect-flash');
 
 
+
 dotenv.config();
 const app = express()
 db()
 
 //trial
 app.use('/uploads/products', express.static(path.join(__dirname, 'public/uploads/products')));
+app.use('/uploads/categories', express.static(path.join(__dirname, 'public/uploads/categories')));
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 //middleware to convert json
@@ -60,6 +63,7 @@ app.set("views",[path.join(__dirname,"views/user"),path.join(__dirname,'views/ad
 app.use("/",userRouter);
 //admin router
 app.use('/admin',adminRouter);
+
 
 
 

@@ -1,0 +1,28 @@
+
+
+<h2>Your Wallet</h2>
+<p>Balance: ₹<%= wallet ? wallet.balance : 0 %></p>
+
+<h3>Transactions</h3>
+<table border="1">
+  <tr>
+    <th>Date</th>
+    <th>Type</th>
+    <th>Amount</th>
+    <th>Description</th>
+  </tr>
+  <% if (wallet && wallet.transactions.length > 0) { %>
+    <% wallet.transactions.forEach(tx => { %>
+      <tr>
+        <td><%= tx.date.toDateString() %></td>
+        <td><%= tx.type %></td>
+        <td><%= tx.amount %></td>
+        <td><%= tx.description %></td>
+      </tr>
+    <% }) %>
+  <% } else { %>
+    <tr><td colspan="4">No transactions yet.</td></tr>
+  <% } %>
+</table>
+
+

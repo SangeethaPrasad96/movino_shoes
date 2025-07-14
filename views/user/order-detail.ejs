@@ -1,0 +1,55 @@
+
+
+
+
+<div class="container" style="margin-top: 50px;">
+    <h2>Order Details</h2>
+    <p><strong>Order ID:</strong> <%= order.orderId %></p>
+    <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
+    <p><strong>Placed On:</strong> <%= order.createdAt.toDateString() %></p>
+  
+    <table border="1" cellspacing="0" cellpadding="10" width="100%" style="margin-top: 20px;">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% order.orderItems.forEach(item => { %>
+          <tr>
+            <td><%= item.product.name %></td>
+            <td><%= item.quantity %></td>
+            <td>₹<%= item.price %></td>
+            <td>₹<%= item.totalPrice %></td>
+            <td><%= item.status %></td>
+            <td>
+              <% if (item.status === 'Pending' || item.status === 'Processing') { %>
+                <form action="/cancel-item/<%= order._id %>/<%= item._id %>" method="POST" style="display:inline;">
+                  <input type="text" name="reason" placeholder="Reason (optional)" />
+                  <button type="submit">Cancel</button>
+                </form>
+              <% } else if (item.status === 'Delivered') { %>
+                <form action="/return-order/<%= order._id %>" method="POST" style="display:inline;">
+                  <input type="text" name="reason" placeholder="Reason for return" required />
+                  <button type="submit">Return</button>
+                </form>
+              <% } else { %>
+                <span style="color: gray;">No Action</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  
+    <div style="margin-top: 30px;">
+      <a href="/my-orders"><button>Back to Orders</button></a>
+      <a href="/invoice/<%= order.orderId %>" target="_blank"><button>Download Invoice</button></a>
+    </div>
+  </div>
+  

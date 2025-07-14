@@ -1,4 +1,7 @@
 <%- include("../../views/partials/admin/header") %>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <div class="d-flex" style="min-height: 100vh;">
   <main class="flex-grow-1 d-flex justify-content-center align-items-center" style="background-color: #f9f9f9;">
@@ -25,7 +28,9 @@
 
         <div class="mb-3">
           <label class="form-label">Current Image</label><br />
-          <img src="/uploads/<%= category.image %>" alt="Category Image" width="150" height="100">
+          <!-- <img src="/uploads/<%= category.image %>" alt="Category Image" width="150" height="100"> -->
+          <img src="/uploads/categories/<%= category.image %>" alt="Category Image" width="150" height="100">
+
         </div>
 
         <div class="mb-3">
@@ -41,5 +46,30 @@
     </div>
   </main>
 </div>
+
+
+<% if (successMessage) { %>
+  <script>
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: '<%= successMessage %>',
+      confirmButtonColor: '#3085d6'
+    });
+  </script>
+<% } %>
+
+<% if (errorMessage) { %>
+  <script>
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: '<%= errorMessage %>',
+      confirmButtonColor: '#d33'
+    });
+  </script>
+<% } %>
+
+
 
 <%- include("../../views/partials/admin/footer") %>

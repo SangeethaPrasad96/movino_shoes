@@ -68,7 +68,7 @@
 					<div class="row">
 						<div class="col-sm-12 text-left menu-1">
 							<ul>
-								<li class="active"><a href="index.html">Home</a></li>
+								<li class="active"><a href="/">Home</a></li>
 								<li class="has-dropdown">
 									<a href="men.html">Men</a>
 									<ul class="dropdown">
@@ -76,13 +76,16 @@
 										<li><a href="cart.html">Shopping Cart</a></li>
 										<li><a href="checkout.html">Checkout</a></li>
 										<li><a href="order-complete.html">Order Complete</a></li>
-										<li><a href="add-to-wishlist.html">Wishlist</a></li>
+										<!-- <li><a href="add-to-wishlist.html">Wishlist</a></li> -->
+										<li><a href="/wishlist">Wishlist</a></li>
+
+										
 									</ul>
 								</li>
 								<li><a href="women.html">Women</a></li>
 								<li><a href="about.html">About</a></li>
 								<li><a href="contact.html">Contact</a></li>
-								<li class="cart"><a href="cart.html"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
+								<li class="cart"><a href="/cart"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
 
 
 							
@@ -239,8 +242,11 @@
 				<% products.forEach(product => { %>
 				  <div class="col-lg-3 mb-4 text-center">
 					<div class="product-entry border">
-					  <a href="#" class="prod-img">
-						<!-- <img src="/uploads/<%= product.image %>" class="img-fluid" alt="<%= product.name %>"> -->
+					  <!-- <a href="#" class="prod-img"> -->
+						<!-- <a href="/product/<%= product._id %>" class="prod-img"> -->
+							<a href="/product-detail/<%= product._id %>" class="prod-img">
+
+
 						
 
 						
@@ -254,7 +260,9 @@
 						  
 					  </a>
 					  <div class="desc">
-						<h2><a href="#"><%= product.name %></a></h2>
+						<!-- <h2><a href="#"><%= product.name %></a></h2> -->
+						<h2><a href="/product-detail/<%= product._id %>"><%= product.name %></a></h2>
+
 						<span class="price">₹<%= product.price %></span>
 					  </div>
 					</div>

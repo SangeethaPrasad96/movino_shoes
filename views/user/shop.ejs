@@ -83,7 +83,10 @@
 								<li><a href="contact.html">Contact</a></li>
 								<li><a href="/login">Login</a></li>
 	                            <li><a href="/signup">Signup</a></li>
-								<li class="cart"><a href="cart.html"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
+								<!-- <li class="cart"><a href="/cart"><i class="icon-shopping-cart"></i> Cart [0]</a></li> -->
+								<li class="cart">
+									<a href="/cart"><i class="icon-shopping-cart"></i> Cart [<%= user && user.cart ? user.cart.length : 0 %>]</a>
+								</li>
 							</ul>
 						</div>
 					</div>
@@ -117,146 +120,87 @@
 		</div>
 
 <!-- code search filter sort -->
+<form method="GET" action="/shop" class="mb-4">
+	<div class="container">
+		<!-- <h5 class="mb-4 text-center">Filter and Sort Products</h5> -->
+		<div class="row gy-3 gx-4 align-items-end justify-content-center">
+			<!-- Search Input -->
+			<div class="col-md-4 col-lg-3">
+				<label for="query" class="form-label"></label>
+				<input type="text" id="query" name="query" placeholder="Search products..." value="<%= query %>" class="form-control" />
+			</div>
 
+			<!-- Sort Dropdown -->
+			<div class="col-md-4 col-lg-3">
+				<label for="sort" class="form-label">Sort By</label>
+				<select id="sort" name="sort" class="form-select">
+					<option value="">Default</option>
+					<option value="low-to-high" <%= sort === 'low-to-high' ? 'selected' : '' %>>Price: Low to High</option>
+					<option value="high-to-low" <%= sort === 'high-to-low' ? 'selected' : '' %>>Price: High to Low</option>
+					<option value="a-z" <%= sort === 'a-z' ? 'selected' : '' %>>Name: A-Z</option>
+					<option value="z-a" <%= sort === 'z-a' ? 'selected' : '' %>>Name: Z-A</option>
+				</select>
+			</div>
 
-  
-
-  <form method="GET" action="/shop" class="mb-4">
-  <div class="row g-2">
-
-	
-    <!-- Search input -->
-    <div class="col-md-3 mb-2">
-      <input type="text" name="query" placeholder="Search products..." value="<%= query %>" class="form-control" />
-    </div>
-
-    <!-- Sort dropdown   this is actually working -->
-    <div class="col-md-2 mb-2">
-      <select name="sort" class="form-control">
-        <option value="">Sort By</option>
-        <option value="low-to-high" <%= sort === 'low-to-high' ? 'selected' : '' %>>Price: Low to High</option>
-        <option value="high-to-low" <%= sort === 'high-to-low' ? 'selected' : '' %>>Price: High to Low</option>
-        <option value="a-z" <%= sort === 'a-z' ? 'selected' : '' %>>Name: A-Z</option>
-        <option value="z-a" <%= sort === 'z-a' ? 'selected' : '' %>>Name: Z-A</option>
-      </select>
-    </div>
-
-    <!-- Category dropdown -->
-    <div class="col-md-2 mb-2">
-      <select name="category" id="categorySelect" class="form-control" onchange="updateSubcategories()">
-        <option value="">All Categories</option>
-        <% 
-
-        const uniqueCatIds = new Set();
-        const uniqueCategories = categories.filter(cat => {
-          if (!uniqueCatIds.has(cat._id.toString())) {
-            uniqueCatIds.add(cat._id.toString());
-            return true;
-          }
-          return false;
-        });
-        
-        uniqueCategories.forEach(cat => { %>
-          <option value="<%= cat._id %>" <%= selectedCategory == cat._id ? 'selected' : '' %>>
-            <%= cat.categoryName %>
-          </option>
-        <% }) %>
-      </select>
-    </div>
-
-    <!-- Subcategory dropdown -->
-    <div class="col-md-2 mb-2">
-      <select name="subCategory" id="subCategorySelect" class="form-control">
-        <option value="">All Subcategories</option>
-		   <!-- // Get all unique subcategories for the selected category -->
-        <% 
-     
-        const subCategorySet = new Set();
-        
-        categories.forEach(cat => {
-          if (!selectedCategory || selectedCategory == cat._id.toString()) {
-            if (cat.subCategory && cat.subCategory.trim() !== '') {
-              subCategorySet.add(cat.subCategory);
-            }
-          }
-        });
-        
-    
-        const uniqueSubCategories = Array.from(subCategorySet).sort();
-        
-        uniqueSubCategories.forEach(subCat => { %>
-          <option value="<%= subCat %>" <%= selectedSubCategory == subCat ? 'selected' : '' %>>
-            <%= subCat %>
-          </option>
-        <% }) %>
-      </select>
-    </div>
-
-    <div class="col-6 col-md-1 mb-2">
-      <input type="number" name="priceMin" placeholder="Min ₹" value="<%= priceMin || '' %>" class="form-control" />
-    </div>
-
-    <div class="col-6 col-md-1 mb-2">
-      <input type="number" name="priceMax" placeholder="Max ₹" value="<%= priceMax || '' %>" class="form-control" />
-    </div>
-
-    <!-- Buttons -->
-    <div class="col-md-1 d-flex gap-1 mb-2">
-      <button type="submit" class="btn btn-sm btn-primary">Apply</button>
-      <a href="/shop" class="btn btn-sm btn-secondary">Clear</a>
-    </div>
+			<!-- Category Dropdown -->
+<div class="col-md-4 col-lg-3">
+	<label for="categorySelect" class="form-label">Category</label>
+	<select id="categorySelect" name="category" class="form-select" onchange="updateSubcategories()">
+	  <option value="">All Categories</option>
+	  <option value="Men" <%= selectedCategory === 'Men' ? 'selected' : '' %>>Men</option>
+	  <option value="Women" <%= selectedCategory === 'Women' ? 'selected' : '' %>>Women</option>
+	</select>
   </div>
+  
+  <!-- Subcategory Dropdown -->
+  <div class="col-md-4 col-lg-3">
+	<label for="subCategorySelect" class="form-label">Subcategory</label>
+	<select id="subCategorySelect" name="subCategory" class="form-select">
+		<option value="">All Subcategories</option>
+		<option value="Casual" <%= selectedSubCategory === 'Casual' ? 'selected' : '' %>>Casual</option>
+		<option value="Sports" <%= selectedSubCategory === 'Sports' ? 'selected' : '' %>>Sports</option>
+		<option value="Formal" <%= selectedSubCategory === 'Formal' ? 'selected' : '' %>>Formal</option>
+	</select>
+</div>
+
+
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+	  // Retain selected subcategory on page load
+	  const subCategorySelect = document.getElementById('subCategorySelect');
+	  const selectedSubCategory = "<%= selectedSubCategory %>";
+  
+	  // Mark the subcategory as selected if it matches the value
+	  Array.from(subCategorySelect.options).forEach(option => {
+		if (option.value === selectedSubCategory) {
+		  option.selected = true;
+		}
+	  });
+	});
+  </script>
+
+			<!-- Price Range -->
+			<div class="col-md-4 col-lg-3">
+				<label for="priceMin" class="form-label"></label>
+				<input type="number" id="priceMin" name="priceMin" placeholder="Min ₹" value="<%= priceMin || '' %>" class="form-control" />
+			</div>
+
+			<div class="col-md-4 col-lg-3">
+				<label for="priceMax" class="form-label"></label>
+				<input type="number" id="priceMax" name="priceMax" placeholder="Max ₹" value="<%= priceMax || '' %>" class="form-control" />
+			</div>
+
+			<!-- Buttons -->
+			<div class="col-md-4 col-lg-3 d-flex gap-3">
+				<button type="submit" class="btn text-white w-100" style="background-color: #339999;">Apply</button>
+				<a href="/shop" class="btn w-100" style="background-color: rgb(229, 225, 230);">Clear</a>
+			</div>
+		</div>
+	</div>
 </form>
 
-<!-- JavaScript for dynamic subcategory updates -->
-<script>
-  function updateSubcategories() {
-    const categorySelect = document.getElementById('categorySelect');
-    const subCategorySelect = document.getElementById('subCategorySelect');
-    const selectedCategoryId = categorySelect.value;
-    
-    // Clear current options except the first one
-    while (subCategorySelect.options.length > 1) {
-      subCategorySelect.remove(1);
-    }
-    
-    // If no category is selected, don't add any subcategories
-    if (!selectedCategoryId) {
-      return;
-    }
-    
-    // Categories data from server (needs to be added in your server-side rendering)
-    const categoriesData = "<%- JSON.stringify(categories) %>";
-    
-    // Get subcategories for selected category
-    const subCategorySet = new Set();
-    
-    categoriesData.forEach(cat => {
-      if (!selectedCategoryId || selectedCategoryId === cat._id.toString()) {
-        if (cat.subCategory && cat.subCategory.trim() !== '') {
-          subCategorySet.add(cat.subCategory);
-        }
-      }
-    });
-    
-    // Add subcategories to select element
-    const uniqueSubCategories = Array.from(subCategorySet).sort();
-    
-    uniqueSubCategories.forEach(subCat => {
-      const option = document.createElement('option');
-      option.value = subCat;
-      option.textContent = subCat;
-      // Check if this was previously selected
-      if ('<%= selectedSubCategory %>' === subCat) {
-        option.selected = true;
-      }
-      subCategorySelect.appendChild(option);
-    });
-  }
-  
-  // Initialize subcategories on page load
-  document.addEventListener('DOMContentLoaded', updateSubcategories);
-</script>
+
 
 <!-- code -->
 
@@ -288,8 +232,8 @@
                                     </a>
                                     <div class="desc">
                                         <!-- Product Name -->
-                                        <h6><a href="#"> <%= product.name %></a></h6>
-                                        
+                                   
+										<h6><a href="/product-detail/<%= product._id %>"><%= product.name %></a></h6>
                                         <!-- Price -->
                                         <span class="price">₹<%= product.price %></span>
                                         
@@ -298,9 +242,16 @@
                                             <a href="/wishlist/add/<%= product._id %>" class="btn btn-sm" style="border: 1px solid #339999;">
                                                 <i class="bi bi-heart-fill" style="color: #339999;"></i> 
                                             </a>
-                                            <a href="/add-to-cart/<%= product._id %>" class="btn btn-sm text-white" style="background-color: #339999;">
+                                            <!-- <a href="/add-to-cart/<%= product._id %>" class="btn btn-sm text-white" style="background-color: #339999;">
                                                 <i class="bi bi-cart3" style="color: #339999;"></i> Add to Cart
-                                            </a>
+                                            </a> -->
+
+											<form action="/cart/add/<%= product._id %>" method="POST" style="display: inline;">
+												<button type="submit" class="btn btn-sm text-white" style="background-color: #339999;">
+													<i class="bi bi-cart3" style="color: #fff;"></i> Add to Cart
+												</button>
+											</form>
+											
                                         </div>
                                     </div>
                                 </div>

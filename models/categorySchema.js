@@ -58,5 +58,9 @@ const categorySchema = new mongoose.Schema({
   { timestamps: true } // for createdAt and updatedAt
 );
 
+
+
+
+
 const Category = mongoose.model("Category",categorySchema);
 module.exports = Category;

@@ -97,7 +97,14 @@ const{ Schema }= mongoose;
 const productSchema = new mongoose.Schema({
   name:
    { type: String,
-     required: true },
+     required: true,
+     index: true},
+
+    //  category:{
+    //           type:Schema.Types.ObjectId,
+    //           ref:"Category",
+    //           required:true,
+    //       },
   category: 
   { type: String, 
     required: true },
@@ -116,7 +123,8 @@ const productSchema = new mongoose.Schema({
     required: true },
   description: 
   { type: String, 
-    required: true },
+    required: true,
+    index: true },
   isDeleted:
    { type: Boolean,
      default: false },

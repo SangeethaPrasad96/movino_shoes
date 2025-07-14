@@ -1,4 +1,7 @@
 <%- include("../../views/partials/admin/header") %>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <div class="d-flex" style="min-height: 100vh;">
   <!-- Sidebar is already included in header, so we focus on main content -->
@@ -38,5 +41,30 @@
     </div>
   </main>
 </div>
+
+
+
+<% if (successMessage) { %>
+  <script>
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: '<%= successMessage %>',
+      confirmButtonColor: '#3085d6'
+    });
+  </script>
+<% } %>
+
+<% if (errorMessage) { %>
+  <script>
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: '<%= errorMessage %>',
+      confirmButtonColor: '#d33'
+    });
+  </script>
+<% } %>
+
 
 <%- include("../../views/partials/admin/footer") %>

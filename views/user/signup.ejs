@@ -148,6 +148,39 @@
             font-size: 0.75rem;
             display: none;
         }
+
+        .password-wrapper {
+    position: relative;
+}
+
+/* password toggle */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 10px 40px 10px 10px; /* space on right for icon */
+  font-size: 16px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 40px; /* fix the height */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+
     </style>
 </head>
 <body>
@@ -172,12 +205,18 @@
                 </div>
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" required>
+                        <img src="/images/eye-close.png" class="toggle-password" onclick="togglePassword('password', this)">
+                    </div>
                     <div id="error3" class="error-message"></div>
                 </div>
                 <div class="input-group">
                     <label for="confirm-password">Confirm Password</label>
-                    <input type="password" id="confirm-password" name="confirm-password" required>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirm-password" name="confirm-password" required>
+                        <img src="/images/eye-close.png" class="toggle-password" onclick="togglePassword('confirm-password', this)">
+                    </div>
                     <div id="error4" class="error-message"></div>
                 </div>
                 <%if(locals.message && message.length>0){%>
@@ -369,6 +408,15 @@
                 }
             });
         });
+
+
+        function togglePassword(fieldId, icon) {
+    const input = document.getElementById(fieldId);
+    const isPassword = input.type === "password";
+
+    input.type = isPassword ? "text" : "password";
+    icon.src = isPassword ? "/images/eye-open.png" : "/images/eye-close.png";
+}
     </script>
 </body>
 </html>

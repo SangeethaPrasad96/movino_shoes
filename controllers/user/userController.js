@@ -3,8 +3,12 @@ const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require('bcrypt')
 const Product = require('../../models/productSchema'); 
+const crypto = require('crypto');
 
 const Category = require('../../models/categorySchema');
+const Address = require('../../models/addressSchema'); 
+const Cart = require('../../models/cartSchema');
+
 
 
 
@@ -14,9 +18,15 @@ const loadHomepage = async (req, res) => {
         const user = req.session.user;
 
         // Fetch 6 latest active products
-        const products = await Product.find({ isDeleted: false }).limit(6);
+        // const products = await Product.find({ isDeleted: false }).limit(6);
+        const products = await Product.find({
+            isDeleted: false,
+            isListed: true,
+            status: "Active"
+          }).limit(6);
+       
 
-        if (user) {
+      if (user) {
             const userData = await User.findOne({ _id: user._id });
             return res.render("home", { user: userData, products }); // Pass products here
         } else {
@@ -97,14 +107,14 @@ const signup = async (req, res) => {
 
         //otp generation
         const otp = generateOtp();
-        console.log("✅ Generated OTP:", otp);
+        console.log("Generated OTP:", otp);
 
 
         const emailSent = await sendVerificationEmail(email, otp);
         console.log("Email Sent Status:", emailSent); 
 
         if (!emailSent) {
-            console.error("❌ Email sending failed");
+            console.error("Email sending failed");
             return res.json("email.error");
         }
 
@@ -139,6 +149,7 @@ const securePassword = async(password)=>{
 const verifyOtp = async (req,res)=>{
     try {
         const {otp}=req.body;
+      
 
        
         console.log("Entered OTP:", otp);
@@ -161,20 +172,24 @@ const verifyOtp = async (req,res)=>{
         await saveUserData.save();
 
         // Store user ID in session after successful signup
-        req.session.user = saveUserData._id;
+        // req.session.user = saveUserData._id;
 
-
+    
           // Clear OTP and user data from session after successful verification
           req.session.userOtp = null;
           req.session.userData = null;
+       
 
 
   // Redirect to login page with success message
  
     //       // Redirect to homepage
+    console.log({ success: true, redirectUrl: "/login" });
+    return res.json({ success: true, redirectUrl: "/login" });
+    
    
-    return res.json({success:true,redirectUrl:"/login"})
-    // return res.redirect('/login');
+
+ 
      }else{
         res.status(400).json({success:false,message:"Invalid OTP,Please try again"})     //invalid otp
      }
@@ -216,6 +231,7 @@ const resendOtp = async (req,res)=>{
 
 const loadLogin = async(req,res)=>{
 try {
+    console.log("Session User:", req.session.user); // Debugging log
     if(!req.session.user){
         return res.render("login")
     }else{
@@ -281,117 +297,128 @@ const logout = (req, res) => {
 
 
 
+
 const getShopPage = async (req, res) => {
-  try {
-    // Get filter parameters from query string
-    const query = req.query.query || '';
-    const sort = req.query.sort || '';
-    const selectedCategory = req.query.category || '';
-    const selectedSubCategory = req.query.subCategory || '';
-    const priceMin = req.query.priceMin ? Number(req.query.priceMin) : '';
-    const priceMax = req.query.priceMax ? Number(req.query.priceMax) : '';
-    
-    // Pagination parameters
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 4; // Products per page
-    const skip = (page - 1) * limit;
-    
-    // Build the query object for MongoDB
-    const filterQuery = {};
-    
-    // Text search if query parameter exists
-    if (query) {
-      filterQuery.$or = [
-        { name: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } }
-      ];
-    }
-    
-    // Category filter
+    try {
+      // Get filter parameters from query string
+      const query = req.query.query || '';
+      const sort = req.query.sort || '';
+      const selectedCategory = req.query.category || '';
+      const selectedSubCategory = req.query.subCategory || '';
+      const priceMin = req.query.priceMin ? Number(req.query.priceMin) : '';
+      const priceMax = req.query.priceMax ? Number(req.query.priceMax) : '';
+  
+      // Pagination parameters
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 4; // Products per page
+      const skip = (page - 1) * limit;
+  
+      // Build the query object for MongoDB
+      const filterQuery = {};
+  
+      // Text search if query parameter exists
+      if (query) {
+        filterQuery.$or = [
+          { name: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } }
+        ];
+      }
+  
+//    category and subcategory filter
+
     if (selectedCategory) {
-      filterQuery.category = selectedCategory;
+        filterQuery.category = { $regex: `^${selectedCategory}$`, $options: 'i' }; // Case-insensitive match
     }
-    
-    // Subcategory filter
+
+    // Add subcategory filter if selected
     if (selectedSubCategory) {
-      filterQuery.subCategory = selectedSubCategory;
+        filterQuery.subcategory = { $regex: `^${selectedSubCategory}$`, $options: 'i' }; // Case-insensitive match
     }
+
+
+
+
     
-    // Price range filter
-    if (priceMin !== '' || priceMax !== '') {
-      filterQuery.price = {};
-      
-      if (priceMin !== '') {
-        filterQuery.price.$gte = priceMin;
+  
+      // Price range filter
+      if (priceMin !== '' || priceMax !== '') {
+        filterQuery.price = {};
+        if (priceMin !== '') filterQuery.price.$gte = priceMin;
+        if (priceMax !== '') filterQuery.price.$lte = priceMax;
       }
+  
+      // Build sort options
+      const sortOptions = {
+        'low-to-high': { price: 1 },
+        'high-to-low': { price: -1 },
+        'a-z': { name: 1 },
+        'z-a': { name: -1 },
+      }[sort] || { createdAt: -1 }; // Default sort by createdAt
+  
+      // Fetch filtered products with pagination and sorting
+      const totalProducts = await Product.countDocuments(filterQuery);
+      const totalPages = Math.ceil(totalProducts / limit);
+  
+      const products = await Product.find(filterQuery)
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit)
+        // .populate('category')
+        .lean();
       
-      if (priceMax !== '') {
-        filterQuery.price.$lte = priceMax;
-      }
+        // console.log('Fetched Products:', products);
+
+
+      // Fetch all listed categories for filters
+      const categories = await Category.find({ status: 'listed' }).lean();
+
+
+   // Fetch subcategories dynamically based on selected category
+   let subCategories = [];
+   if (selectedCategory) {
+     const category = await Category.findOne({ name: selectedCategory });
+     if (category) {
+       subCategories = category.subCategories; // Assuming category has a 'subCategories' field
+     }
+   }
+
+
+
+
+
+ 
+
+      // Render the shop page with required data
+      res.render('shop', {
+        title: 'Shop',
+        user: req.session.user || null, // Pass user object to the view
+        products,
+        categories,
+        subCategories, // Pass subcategories for dynamic dropdown
+        query,
+        sort,
+        selectedCategory,
+        selectedSubCategory,
+        priceMin,
+        priceMax,
+        currentPage: page,
+        totalPages,
+        totalProducts,
+        categoriesJson: JSON.stringify(categories), // Pass categories for client-side JS
+      });
+    } catch (error) {
+      console.error('Shop page error:', error.message); // Log detailed error message
+      res.status(500).render('error', {
+        message: 'An error occurred while loading the shop page. Please try again later.',
+      });
     }
-    
-    // Build sort options
-    let sortOptions = {};
-    
-    switch (sort) {
-      case 'low-to-high':
-        sortOptions = { price: 1 };
-        break;
-      case 'high-to-low':
-        sortOptions = { price: -1 };
-        break;
-      case 'a-z':
-        sortOptions = { name: 1 };
-        break;
-      case 'z-a':
-        sortOptions = { name: -1 };
-        break;
-      default:
-        // Default sort (e.g., by createdAt)
-        sortOptions = { createdAt: -1 };
-    }
-    
-    // Count total matching products for pagination
-    const totalProducts = await Product.countDocuments(filterQuery);
-    const totalPages = Math.ceil(totalProducts / limit);
-    
-    // Fetch products with filters and pagination applied
-    const products = await Product.find(filterQuery)
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(limit)
-      .populate('category')
-      .lean();
-    
-    // Fetch all categories for the filter dropdowns
-    // const categories = await Category.find({}).lean();
-    const categories = await Category.find({ status: 'listed' }).lean();
-    
-    // Render shop page with data
-    res.render('shop', {
-      title: 'Shop',
-      products,
-      categories,
-      query,
-      sort,
-      selectedCategory,
-      selectedSubCategory,
-      priceMin,
-      priceMax,
-      // Pagination data
-      currentPage: page,
-      totalPages,
-      totalProducts,
-      // Pass categories as JSON string for client-side JS
-      categoriesJson: JSON.stringify(categories)
-    });
-  } catch (error) {
-    console.error('Shop page error:', error);
-    res.status(500).render('error', {
-      message: 'An error occurred while loading the shop page'
-    });
-  }
-};
+  };
+  
+ 
+
+
+
+
 
 const getProductDetail = async (req, res) => {
   try {
@@ -410,7 +437,455 @@ const getProductDetail = async (req, res) => {
 };
 
 
+//PROFILE 
 
+const uploadProfileImage = async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    // const imagePath = "/uploads/users/" + req.file.filename;
+    const imagePath = `/uploads/users/${req.file.filename}`;
+
+    await User.findByIdAndUpdate(userId, {
+      profileImage: imagePath
+    });
+
+    // Update session image if you’re showing image from session
+    req.session.user.profileImage = imagePath;
+
+    res.redirect('/profile');
+  } catch (err) {
+    console.error("Profile image upload failed:", err);
+    res.status(500).send("Server error");
+   
+  }
+};
+
+//forgot password
+
+
+
+const sendOtpMail = async (email, otp) => {
+    const transporter = nodemailer.createTransport({
+        // service: "Gmail",
+        // auth: {
+        //     user: "your_email@gmail.com",
+        //     pass: "your_app_password", // App password from Gmail
+        // },
+        service: 'gmail',
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        auth: {
+            user: process.env.NODEMAILER_EMAIL,
+            pass: process.env.NODEMAILER_PASSWORD
+        }
+    });
+
+    const mailOptions = {
+        from: process.env.NODEMAILER_EMAIL,
+        to: email,
+        subject: "Your OTP for Password Reset",
+        text: `Your OTP code is: ${otp}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+
+
+       
+
+
+
+const loadForgotPassword = (req, res) => {
+    res.render("forgotPassword"); // You will create this EJS file
+};
+
+const handleForgotPassword = async (req, res) => {
+    const email = req.body.email;
+
+    // Validate email and check if user exists
+    const user = await User.findOne({ email: email });
+    if (!user) {
+        return res.render("forgotPassword", { error: "Email not found" });
+    }
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    req.session.forgotOtp = otp;
+    req.session.resetEmail = email;
+
+
+    console.log("Generated OTP:", otp);
+    // Send OTP via email (replace with your mailer)
+    await sendOtpMail(email, otp);
+   
+    res.redirect("/verify-forgot-otp");
+};
+
+
+const loadForgotOtp = (req, res) => {
+    res.render("verifyForgotOtp", { error: null });
+};
+
+const verifyForgotOtp = (req, res) => {
+    const { otp } = req.body;
+    const sessionOtp = req.session.forgotOtp;
+
+    if (otp === sessionOtp) {
+        // OTP verified
+        return res.redirect("/reset-password");
+    } else {
+        return res.render("verifyForgotOtp", { error: "Invalid OTP" });
+    }
+};
+
+
+const loadResetPassword = (req, res) => {
+    res.render("resetPassword");
+};
+
+const handleResetPassword = async (req, res) => {
+    const { password, confirmPassword } = req.body;
+
+    if (password !== confirmPassword) {
+        return res.render("resetPassword", { error: "Passwords do not match" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await User.updateOne({ email: req.session.resetEmail }, { $set: { password: hashedPassword } });
+
+    // Clear session values
+    req.session.resetEmail = null;
+    req.session.forgotOtp = null;
+
+    // Optional: Flash message
+    req.flash("success", "Password changed successfully!");
+    res.redirect("/login");
+};
+
+
+
+
+
+//  Edit Profile page
+
+
+const getEditProfile = (req, res) => {
+    const user = req.session.user; 
+    if (!user) {
+        return res.redirect('/login'); 
+    }
+    res.render('edit-profile', { user });
+};
+
+const postEditProfile = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        const userId = req.session.user.id; 
+
+   
+        await User.findByIdAndUpdate(userId, { name, email });
+
+      
+        req.session.user.name = name;
+        req.session.user.email = email;
+
+        res.redirect('/profile'); 
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+const updateName = async (req, res) => {
+    try {
+        const userId = req.session.user._id;
+        const { name } = req.body;
+        await User.findByIdAndUpdate(userId, { name });
+        req.session.user.name = name;
+        res.json({ success: true, updatedName: name }); 
+      
+    } catch (error) {
+      console.error(error);
+      res.json({ success: false });
+    }
+};
+
+
+
+
+
+
+// Generate and Send OTP
+const sendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+        console.log("📨 Sending OTP to:", email);
+        const otp = Math.floor(100000 + Math.random() * 900000); 
+
+        req.session.otp = otp;
+        req.session.newEmail = email;
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      pass: process.env.NODEMAILER_PASSWORD
+        
+    }
+});
+
+await transporter.sendMail({
+    from: process.env.EMAIL,
+    to: email,
+    subject: 'Verify Your Email',
+    text: `Your OTP is ${otp}`
+});
+
+
+console.log("✅ OTP sent:", otp);
+res.json({ success: true });
+} catch (error) {
+res.status(500).json({ success: false, message: 'Server error' });
+}
+};
+
+
+
+// Verify OTP and Update Email
+const verifyEmailOTP = async (req, res) => {
+  try {
+      const { otp, email } = req.body;
+
+      if (parseInt(req.session.otp) === parseInt(otp) && req.session.newEmail === email) {
+          const userId = req.session.user._id;
+
+          // Update in DB
+          await User.findByIdAndUpdate(userId, { email });
+          req.session.user.email = email;
+
+          // Clear session
+          req.session.otp = null;
+          req.session.newEmail = null;
+
+          res.json({ success: true });
+      } else {
+          res.status(400).json({ success: false, message: 'Invalid OTP or Email' });
+      }
+  } catch (error) {
+      console.error("OTP verification error:", error);
+      res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+
+
+// password
+const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user.id);
+
+        // Validate current password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Incorrect current password' });
+        }
+
+        // Hash and update new password
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        res.json({ success: true, message: 'Password changed successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+
+
+//address
+
+
+
+const viewAddress = async (req, res) => {
+    const userId = req.session.user._id;
+  
+    const addresses = await Address.find({ userId });
+  
+    const defaultAddress = addresses.find(addr => addr.isDefault === true);
+    const otherAddresses = addresses.filter(addr => addr.isDefault !== true);
+  
+
+    // console.log('Default Address:', defaultAddress);
+
+    res.render('address', {
+      user: req.session.user,
+      defaultAddress,
+      otherAddresses
+    });
+  };
+
+
+
+const addAddress = async (req, res) => {
+    try {
+      const { fullName, phone, pincode, state, city, addressLine } = req.body;
+      const userId = req.session.user._id;
+  
+      await Address.create({
+        userId,
+        fullName,
+        phone,
+        pincode,
+        state,
+        city,
+        addressLine
+      });
+  
+      res.redirect('/address');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Something went wrong');
+    }
+  };
+  
+
+const editAddress = async (req, res) => {
+  await Address.findByIdAndUpdate(req.params.id, req.body);
+  res.redirect('/address');
+};
+
+const deleteAddress = async (req, res) => {
+  await Address.findByIdAndDelete(req.params.id);
+  res.redirect('/address');
+};
+
+const setDefaultAddress = async (req, res) => {
+  const userId = req.session.user._id;
+  const addressId = req.params.id;
+  await Address.updateMany({ userId }, { $set: { isDefault: false } });
+  await Address.findByIdAndUpdate(addressId, { isDefault: true });
+  res.redirect('/address');
+};
+
+
+//checkout 
+
+const checkoutPage = async (req, res) => {
+    try {
+      const userId = req.session.user?._id;
+  
+      if (!userId) {
+        return res.redirect('/login');
+      }
+  
+      // ✅ Use Cart model to fetch items
+      const cart = await Cart.findOne({ userId, status: 'active' }).populate('items.productId');
+  
+      if (!cart || cart.items.length === 0) {
+        return res.render('checkout', {
+          user: req.session.user,
+          cartItems: [],
+          otherAddresses: [],
+          totalPrice: 0
+        });
+      }
+  
+      const addresses = await Address.find({ userId });
+  
+      let totalPrice = 0;
+      cart.items.forEach(item => {
+        if (item.productId) {
+          totalPrice += item.productId.price * item.quantity;
+        }
+      });
+  
+      res.render('checkout', {
+        user: req.session.user,
+        cartItems: cart.items,
+        otherAddresses: addresses,
+        totalPrice
+      });
+  
+    } catch (err) {
+      console.error("Checkout page error:", err.message);
+      res.status(500).send("Error loading checkout page");
+    }
+  };
+  
+  
+
+  const saveAddress = async (req, res) => {
+    try {
+      const data = req.body;
+      const userId = req.session.user?._id;
+  
+      if (!userId) {
+        return res.status(401).send('Unauthorized');
+      }
+  
+      if (data._id) {
+        //  Edit existing address
+        await Address.updateOne(
+          { _id: data._id, userId },
+          {
+            fullName: data.fullName,
+            addressLine: data.addressLine,
+            city: data.city,
+            state: data.state,
+            pincode: data.pincode,
+            phone: data.phone
+          }
+        );
+      } else {
+        // ➕ Add new address
+        await Address.create({
+          userId,
+          fullName: data.fullName,
+          addressLine: data.addressLine,
+          city: data.city,
+          state: data.state,
+          pincode: data.pincode,
+          phone: data.phone,
+          isDefault: false
+        });
+      }
+  
+      res.redirect('/checkout');
+    } catch (err) {
+      console.error('Error saving address:', err);
+      res.status(500).send('Something went wrong');
+    }
+  };
+  
+
+
+  
+
+const editAddressCheckout = async (req, res) => {
+  try {
+    const { _id, fullName, addressLine, city, state, pincode, phone } = req.body;
+
+    await Address.findByIdAndUpdate(_id, {
+      fullName,
+      addressLine,
+      city,
+      state,
+      pincode,
+      phone
+    });
+
+    res.redirect('/checkout'); // Or wherever your address page is
+  } catch (err) {
+    console.error('Edit Address Error:', err);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+
+  
 
 
 module.exports = {
@@ -425,4 +900,32 @@ module.exports = {
     logout,
     getShopPage,
     getProductDetail,
+    loadForgotPassword,
+    handleForgotPassword,
+    loadForgotOtp,
+    verifyForgotOtp,
+    sendOtpMail,
+    loadResetPassword,
+    handleResetPassword,
+    getEditProfile,
+    postEditProfile,
+    updateName,
+    changePassword,
+    sendOTP,
+    verifyEmailOTP,
+    viewAddress,
+    addAddress,
+    editAddress,
+    deleteAddress,
+    setDefaultAddress,
+    checkoutPage,
+    saveAddress,
+    editAddressCheckout,
+    uploadProfileImage
+   
+
+
+
+   
+
 };

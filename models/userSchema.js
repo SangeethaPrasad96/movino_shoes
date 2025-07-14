@@ -12,6 +12,12 @@ const userSchema = new Schema({
         required:true,
         unique:true,
     },
+
+    profileImage: {
+        type: String,
+        default: "/images/default-user.png"  // You can customize this path
+      },
+    
     // phone:{
     //     type:String,
     //     required:false,//single signup time username emailid only

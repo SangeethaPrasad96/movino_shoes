@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE HTML>
+<html>
+	<head>
+	<title>Movino_shoes</title>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+	
+
+
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="css/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="css/icomoon.css">
+	<!-- Ion Icon Fonts-->
+	<link rel="stylesheet" href="css/ionicons.min.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/magnific-popup.css">
+
+	<!-- Flexslider  -->
+	<link rel="stylesheet" href="css/flexslider.css">
+
+	<!-- Owl Carousel -->
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	
+	<!-- Date Picker -->
+	<link rel="stylesheet" href="css/bootstrap-datepicker.css">
+	<!-- Flaticons  -->
+	<link rel="stylesheet" href="fonts/flaticon/font/flaticon.css">
+
+	<!-- Theme style  -->
+	<link rel="stylesheet" href="css/style.css">
+<style>
+    .list-group-item.active {
+        background-color: #339999 !important;
+        color: white !important;
+        border-color: #339999 !important;
+    }
+    
+    .card-body img {
+        margin-bottom: 15px;
+    }
+    
+    .btn-sm {
+        margin-right: 10px;
+    }
+
+
+
+    
+</style>
+	</head>
+
+	
+	<body>
+		<!-- Breadcrumbs -->
+
+
+        <nav class="colorlib-nav" role="navigation">
+            
+            <div class="top-menu">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-7 col-md-9">
+                            <div id="colorlib-logo"><a href="/">M O V I N O</a></div>
+                        </div>
+                        <div class="col-sm-5 col-md-3">
+                            <form action="#" class="search-wrap">
+                                <div class="form-group">
+                                    <input type="search" class="form-control search" placeholder="Search">
+                                    <button class="btn btn-primary submit-search text-center" type="submit"><i class="icon-search"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-left menu-1">
+                            <ul>
+                                <li class="active"><a href="/">Home</a></li>
+                                <li class="has-dropdown">
+                                    <a href="/men">Men</a>
+                                    <ul class="dropdown">
+                                        <li><a href="/product-detail">Product Detail</a></li>
+                                        <li><a href="/cart">Shopping Cart</a></li>
+                                        <li><a href="/checkout">Checkout</a></li>
+                                        <li><a href="/order-complete">Order Complete</a></li>
+                                        <li><a href="/wishlist">Wishlist</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="/women">Women</a></li>
+                                <li><a href="/about">About</a></li>
+                                <li><a href="/contact">Contact</a></li>
+                                <li class="cart"><a href="/cart"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
+        
+                              
+
+                                
+                               
+                               
+<!-- it is the dropdown appears when user login -->
+                                <% if (user) { %>
+                                <li class="has-dropdown">
+                                    <a href="javascript:void(0);" class="dropdown-link"><strong><%= user.name %></strong></a>
+                                    <ul class="dropdown">
+                                        <li><a href="/profile">Profile</a></li>
+                                        <li><a href="/logout">Logout</a></li>
+                                    </ul>
+                                </li>
+                                <% } else { %>
+                                <li><a href="/login">Login</a></li>
+                                <li><a href="/signup">Signup</a></li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+                         
+        <div class="breadcrumbs">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <p class="bread"><span><a href="/">Home</a></span> / <span><a href="/profile">Profile</a></span>/ <span>Edit</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+                                <!-- header end-->
+
+<!--  -->
+                                
+                                
+<div class="container mt-5">
+    <div class="row">
+        
+<!-- Sidebar -->
+
+        <!-- 1. Image -->
+        <div class="col-md-3">
+            <div class="mb-3">
+                <img src="/images/default-user.png" alt="User Image" class="img-fluid rounded-circle" style="width: 120px; height: 120px;">
+            </div>
+           
+            <!-- Sidebar Navigation -->
+            <div class="list-group mt-4">
+                <a href="/profile" class="list-group-item list-group-item-action active" style="background-color: #339999; color: white;">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                <a href="/orders" class="list-group-item list-group-item-action">
+                    <i class="fas fa-box"></i> Orders
+                </a>
+                <a href="/address" class="list-group-item list-group-item-action">
+                    <i class="fas fa-map-marker-alt"></i> Address
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+                            
+         <!-- 1.edit profile heading                           -->
+<div class="col-md-9">
+        <div class="card">
+                <div class="card-header">
+                    <h4>Edit Profile</h4>
+                </div>
+
+                 <!-- 2.update name -->
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="name" 
+                            name="name" 
+                            value="<%= user.name %>" 
+                            required>
+                            <button id="updateNameBtn" class="btn btn-primary mt-2">Update Name</button>
+                </div>
+                   
+
+                 <!-- 3.Email section -->
+
+                <p><strong>Email:</strong> <%= user.email %>
+                <button type="button" class="btn btn-sm btn-primary" onclick="openEmailModal()">Change</button>
+                </p>
+
+             <!-- Email Change Modal -->
+                <div id="emailModal" class="modal" tabindex="-1" style="display:none;">
+                <div class="modal-dialog">
+                <div class="modal-content p-4">
+                      <h5>Verify Email Change</h5>
+                       <input type="email" id="newEmail" class="form-control my-2" placeholder="Enter new email" required>
+                       <button onclick="sendOTP()" class="btn btn-success btn-sm mb-2">Send OTP</button>
+
+                 <!-- OTP Section -->
+                <div id="otpSection" style="display: none;">
+                     <input type="text" id="otpInput" class="form-control mb-2" placeholder="Enter OTP" required>
+                     <small id="timer">60</small>s
+                     <button onclick="verifyOTP()" class="btn btn-primary btn-sm">Verify</button>
+                </div>
+
+                 <button onclick="closeEmailModal()" class="btn btn-secondary btn-sm mt-2">Cancel</button>
+             </div>
+         </div>
+     </div>
+                <!-- 4.password                           -->
+                               
+          <form id="changePasswordForm" method="POST">
+            <div class="form-group mt-4">
+                <label for="currentPassword">Current Password</label>
+                <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" name="newPassword" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmNewPassword">Confirm New Password</label>
+                <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Change Password</button>
+        </form>
+        
+        
+
+
+
+
+                                  
+
+
+
+         <script>
+
+
+// update name
+
+document.getElementById('updateNameBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+
+    const response = await fetch('/update-name', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+    });
+    const data = await response.json();
+
+    if (data.success) {
+        Swal.fire('Success', 'Name updated successfully!', 'success');
+        document.querySelector('.dropdown-link strong').innerText = data.updatedName;
+    } else {
+        Swal.fire('Error', 'Failed to update name. Try again.', 'error');
+    }
+});
+
+
+// Open Email Modal
+
+function openEmailModal() {
+    document.getElementById('emailModal').style.display = 'block';
+}
+
+function closeEmailModal() {
+    document.getElementById('emailModal').style.display = 'none';
+    document.getElementById('otpSection').style.display = 'none';
+}
+
+async function sendOTP() {
+    const email = document.getElementById('newEmail').value;
+    if (!email) return Swal.fire('Error', 'Enter a valid email.', 'error');
+
+    const response = await fetch('/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+        Swal.fire('Success', 'OTP sent!', 'success');
+        document.getElementById('otpSection').style.display = 'block';
+    } else {
+        Swal.fire('Error', data.message || 'Failed to send OTP', 'error');
+    }
+}
+
+async function verifyOTP() {
+    const email = document.getElementById('newEmail').value;
+    const otp = document.getElementById('otpInput').value;
+
+    const response = await fetch('/verify-email-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+        Swal.fire('Success', 'Email updated!', 'success');
+        closeEmailModal();
+        // document.querySelector('strong').innerText = email;
+    } else {
+        Swal.fire('Error', data.message || 'Invalid OTP', 'error');
+    }
+}
+
+
+
+
+
+
+
+    // password
+
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+        if (newPassword !== confirmNewPassword) {
+            Swal.fire('Error', 'Passwords do not match!', 'error');
+            return;
+        }
+
+        const response = await fetch('/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire('Success', 'Password changed successfully!', 'success');
+        } else {
+            Swal.fire('Error', data.message, 'error');
+        }
+    });
+
+
+
+    
+  
+</script>
+
+
+<!-- footer -->
+
+<footer id="colorlib-footer" role="contentinfo">
+    <!-- <div class="container"> -->
+        <div class="row row-pb-md">
+            <div class="col footer-col colorlib-widget">
+                <h4>About Footwear</h4>
+                <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life</p>
+                <p>
+                    <ul class="colorlib-social-icons">
+                        <li><a href="#"><i class="icon-twitter"></i></a></li>
+                        <li><a href="#"><i class="icon-facebook"></i></a></li>
+                        <li><a href="#"><i class="icon-linkedin"></i></a></li>
+                        <li><a href="#"><i class="icon-dribbble"></i></a></li>
+                    </ul>
+                </p>
+            </div>
+            <div class="col footer-col colorlib-widget">
+                <h4>Customer Care</h4>
+                <p>
+                    <ul class="colorlib-footer-links">
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Returns/Exchange</a></li>
+                        <li><a href="#">Gift Voucher</a></li>
+                        <li><a href="#">Wishlist</a></li>
+                        <li><a href="#">Special</a></li>
+                        <li><a href="#">Customer Services</a></li>
+                        <li><a href="#">Site maps</a></li>
+                    </ul>
+                </p>
+            </div>
+            <div class="col footer-col colorlib-widget">
+                <h4>Information</h4>
+                <p>
+                    <ul class="colorlib-footer-links">
+                        <li><a href="#">About us</a></li>
+                        <li><a href="#">Delivery Information</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">Order Tracking</a></li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="col footer-col">
+                <h4>News</h4>
+                <ul class="colorlib-footer-links">
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Exhibitions</a></li>
+                </ul>
+            </div>
+
+            <div class="col footer-col">
+                <h4>Contact Information</h4>
+                <ul class="colorlib-footer-links">
+                    <li>291 South 21th Street, <br> Suite 721 New York NY 10016</li>
+                    <li><a href="tel://1234567920">+ 1235 2355 98</a></li>
+                    <li><a href="mailto:info@yoursite.com">info@yoursite.com</a></li>
+                    <li><a href="#">yoursite.com</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="copy">
+        <div class="row">
+            <div class="col-sm-12 text-center">
+                <p>
+                    <span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></span> 
+                    <span class="block">Demo Images: <a href="http://unsplash.co/" target="_blank">Unsplash</a> , <a href="http://pexels.com/" target="_blank">Pexels.com</a></span>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+
+<div class="gototop js-top">
+<a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
+</div>
+
+<!-- jQuery -->
+<script src="js/jquery.min.js"></script>
+<!-- popper -->
+<script src="js/popper.min.js"></script>
+<!-- bootstrap 4.1 -->
+<script src="js/bootstrap.min.js"></script>
+<!-- jQuery easing -->
+<script src="js/jquery.easing.1.3.js"></script>
+<!-- Waypoints -->
+<script src="js/jquery.waypoints.min.js"></script>
+<!-- Flexslider -->
+<script src="js/jquery.flexslider-min.js"></script>
+<!-- Owl carousel -->
+<script src="js/owl.carousel.min.js"></script>
+<!-- Magnific Popup -->
+<script src="js/jquery.magnific-popup.min.js"></script>
+<script src="js/magnific-popup-options.js"></script>
+<!-- Date Picker -->
+<script src="js/bootstrap-datepicker.js"></script>
+<!-- Stellar Parallax -->
+<script src="js/jquery.stellar.min.js"></script>
+<!-- Main -->
+<script src="js/main.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+ </body>
+</html>

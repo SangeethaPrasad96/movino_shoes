@@ -1,0 +1,58 @@
+<%- include("../../views/partials/admin/header") %>
+
+
+
+<h1>Order Details - <%= order.orderId %></h1>
+<p>Date: <%= order.createdAt.toDateString() %></p>
+<p>User: <%= order.user.name %> - <%= order.user.email %></p>
+
+<h3>Items</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Qty</th>
+      <th>Status</th>
+      <th>Refund</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% order.orderItems.forEach(item => { %>
+      <tr>
+        <td><%= item.product.name %></td>
+        <td><%= item.quantity %></td>
+        <td><%= item.status %></td>
+        <td>
+            <% if (item.status === 'Returned') { %>
+                <form method="POST" action="/admin/orders/verify-return/<%= order.orderId %>/<%= item._id %>">
+                  <button type="submit">Verify Refund</button>
+                </form>
+              <% } else if (item.status === 'Refunded') { %>
+                Refunded
+              <% } else { %>
+                -
+              <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+
+
+<h3>Update Order Status</h3>
+<form method="POST" action="/admin/orders/update-status/<%= order.orderId %>">
+  <select name="status" required>
+    <option value="Pending" <%= order.orderItems[0].status === 'Pending' ? 'selected' : '' %>>Pending</option>
+    <option value="Shipped" <%= order.orderItems[0].status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+    <option value="Out for Delivery" <%= order.orderItems[0].status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+    <option value="Delivered" <%= order.orderItems[0].status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+    <option value="Cancelled" <%= order.orderItems[0].status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+    <option value="Returned" <%= order.orderItems[0].status === 'Returned' ? 'selected' : '' %>>Returned</option> 
+  </select>
+  <button type="submit">Update</button>
+</form>
+
+
+<%- include("../../views/partials/admin/footer") %>
+

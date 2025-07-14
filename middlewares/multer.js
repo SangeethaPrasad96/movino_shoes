@@ -2,41 +2,37 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Destination folder for original uploads
-const destinationPath = path.join(__dirname, '../public/uploads/temp');
-if (!fs.existsSync(destinationPath)) {
-  fs.mkdirSync(destinationPath, { recursive: true });
-}
-
-// Configure diskStorage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, destinationPath);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const filename = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
-    cb(null, filename);
+// Helper to create folder-specific storage
+const createStorage = (folderName) => {
+  const folderPath = path.join(__dirname, `../public/uploads/${folderName}`);
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });
   }
-});
 
-// Filter only images
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only jpg, jpeg, png files are allowed'), false);
-  }
+  return multer.diskStorage({
+    destination: (req, file, cb) => cb(null, folderPath),
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+      cb(null, filename);
+    },
+  });
 };
 
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 2 * 1024 * 1024 } // 2MB max
-});
+// File type filter
+const fileFilter = (req, file, cb) => {
+  const allowed = ['image/jpeg', 'image/jpg', 'image/png'];
+  allowed.includes(file.mimetype) ? cb(null, true) : cb(new Error('Only jpg, jpeg, png allowed'), false);
+};
 
-module.exports = upload;
+// 2MB size limit
+const limits = { fileSize: 2 * 1024 * 1024 };
+
+module.exports = {
+  uploadCategory: multer({ storage: createStorage('categories'), fileFilter, limits }),
+  uploadProduct: multer({ storage: createStorage('products'), fileFilter, limits })
+};
+
 
 
 

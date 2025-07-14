@@ -1,4 +1,6 @@
 const Category = require("../../models/categorySchema");
+const Product = require("../../models/productSchema");
+
 
 // List with Search + Pagination
 const getCategories = async (req, res) => {
@@ -29,17 +31,49 @@ const getCategories = async (req, res) => {
   });
 };
 
+// const addCategoryPage = (req, res) => {
+//   res.render("addCategory");
+// };
+
+// const addCategory = async (req, res) => {
+//   const { categoryName, subCategory } = req.body;
+//   const image = req.file ? req.file.filename : null;
+
+//   await Category.create({ categoryName, subCategory, image });
+//   req.flash('successMessage', 'Category added successfully!');
+//   res.redirect("/admin/categories");
+ 
+
+
+// };
+
+// GET: Render Add Category Page
 const addCategoryPage = (req, res) => {
-  res.render("addCategory");
+  res.render("addCategory", {
+    successMessage: req.flash("successMessage"),
+    errorMessage: req.flash("errorMessage")
+  });
 };
 
+// POST: Add Category
 const addCategory = async (req, res) => {
-  const { categoryName, subCategory } = req.body;
-  const image = req.file ? req.file.filename : null;
+  try {
+    const { categoryName, subCategory } = req.body;
+    const image = req.file ? req.file.filename : null;
 
-  await Category.create({ categoryName, subCategory, image });
-  res.redirect("/admin/categories");
+    await Category.create({ categoryName, subCategory, image });
+
+    req.flash('successMessage', 'Category added successfully!');
+    res.redirect("/admin/categories/add"); // redirect back to form if you want to show alert here
+  } catch (error) {
+    console.error("Error adding category:", error);
+    req.flash('errorMessage', 'Something went wrong!');
+    res.redirect("/admin/categories/add");
+  }
 };
+
+
+
 
 const editCategoryPage = async (req, res) => {
   const category = await Category.findById(req.params.id);
@@ -57,10 +91,37 @@ const editCategory = async (req, res) => {
   res.redirect("/admin/categories");
 };
 
+// const softDeleteCategory = async (req, res) => {
+//   await Category.findByIdAndUpdate(req.params.id, { isDeleted: true });
+//   res.json({ success: true });
+// };
+
+
 const softDeleteCategory = async (req, res) => {
-  await Category.findByIdAndUpdate(req.params.id, { isDeleted: true });
-  res.json({ success: true });
+  try {
+    const category = await Category.findByIdAndUpdate(req.params.id, { isDeleted: true }, { new: true });
+
+    if (category) {
+      // Also mark all products under this category as deleted
+      await Product.updateMany(
+        { category: category.categoryName },
+       
+        { $set: { isDeleted: true } }
+     
+      );
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error in soft deleting category and its products:", err);
+    res.json({ success: false, message: "Error deleting category" });
+  }
 };
+
+
+
+
+
 
 const recoveryPage = async (req, res) => {
   const deletedCategories = await Category.find({ isDeleted: true });
@@ -68,10 +129,68 @@ const recoveryPage = async (req, res) => {
 };
 
 // Add if you want recover functionality too
+// const recoverCategory = async (req, res) => {
+//   await Category.findByIdAndUpdate(req.params.id, { isDeleted: false });
+//   res.redirect("/admin/categories");
+// };
+
+
+// const recoverCategory = async (req, res) => {
+//   const category = await Category.findByIdAndUpdate(req.params.id, { isDeleted: false }, { new: true });
+
+//   if (category) {
+    
+//     await Product.updateMany(
+//       { category: category.categoryName },
+//       { $set: { isDeleted: false } }
+     
+//     );
+//   }
+
+//   res.redirect("/admin/categories");
+// };
 const recoverCategory = async (req, res) => {
-  await Category.findByIdAndUpdate(req.params.id, { isDeleted: false });
-  res.redirect("/admin/categories");
+  try {
+
+    console.log("recoverCategory function called with ID:", req.params.id);
+    // Recover the category
+    const category = await Category.findByIdAndUpdate(
+      req.params.id,
+      { isDeleted: false },
+      { new: true } // Return the updated document
+    );
+
+    if (!category) {
+      console.error("Category not found for recovery:", req.params.id);
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
+    // Debug: Log the recovered category name
+    console.log("Recovered category name:", category.categoryName);
+
+    // Recover all related products (case-insensitive match)
+    const updatedProductsResult = await Product.updateMany(
+      { category: { $regex: new RegExp(`^${category.categoryName}$`, "i") } }, // Case-insensitive match
+      { $set: { isDeleted: false } }
+    );
+
+    // Debug: Log the number of updated products
+    console.log(
+      `Products updated for category (${category.categoryName}):`,
+      updatedProductsResult.modifiedCount
+    );
+
+    // Redirect back to admin categories
+    res.redirect("/admin/categories");
+  } catch (err) {
+    console.error("Error recovering category and its products:", err);
+    res.status(500).json({ success: false, message: "Error recovering category" });
+  }
 };
+
+
+
+
 
 module.exports = {
   getCategories,
@@ -81,5 +200,6 @@ module.exports = {
   editCategory,
   softDeleteCategory,
   recoveryPage,
-  recoverCategory, // optional if needed
+  recoverCategory,
+
 };

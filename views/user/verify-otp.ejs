@@ -256,15 +256,17 @@ function validateOtpForm(){
         url:"/verify-otp",
         data:{otp:otpInput},
         success:function(response){
+            console.log("Response from backend:", response); // Debugging
             if(response.success){
-                Swal.fire({
-                    icon:"success",
-                    title:"OTP verified successfully",
-                    showConfirmButton:false,
-                    timer:1500,
-               }).then(()=>{
+                console.log("Redirecting to:", response.redirectUrl); // Debugging
+                // Swal.fire({
+                //     icon:"success",
+                //     title:"OTP verified successfully",
+                //     showConfirmButton:false,
+                //     timer:1500,
+            //    }).then(()=>{
                 window.location.href = response.redirectUrl;
-               });
+            //    });
             }else{
                 Swal.fire({
                     icon:"error",

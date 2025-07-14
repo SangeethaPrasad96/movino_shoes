@@ -1,0 +1,86 @@
+<%- include("../../views/partials/admin/header") %>
+
+
+
+
+<h1>Order Management</h1>
+
+<!-- Search + Filter -->
+<form method="GET" style="margin-bottom: 20px;">
+  <input type="text" name="search" placeholder="Search by Order ID/User" value="<%= search %>">
+  
+  <select name="status">
+    <option value="">All Status</option>
+    <option value="Pending" <%= status === 'Pending' ? 'selected' : '' %>>Pending</option>
+    <option value="Shipped" <%= status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+    <option value="Delivered" <%= status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+    <option value="Cancelled" <%= status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+    <option value="Returned" <%= status === 'Returned' ? 'selected' : '' %>>Returned</option>
+  </select>
+
+  <select name="sort">
+    <option value="desc" <%= sort === 'desc' ? 'selected' : '' %>>Newest First</option>
+    <option value="asc" <%= sort === 'asc' ? 'selected' : '' %>>Oldest First</option>
+  </select>
+
+  <button type="submit">Search</button>
+  <a href="/admin/orders"><button type="button">Clear</button></a>
+</form>
+
+<!-- Table -->
+<table border="1" cellpadding="8" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>User</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% orders.forEach(order => { %>
+      <tr>
+        <td><%= order.orderId %></td>
+     
+    
+        <td>
+            <% if (order.user && order.user.name) { %>
+              <%= order.user.name %>
+            <% } else { %>
+              Guest
+            <% } %>
+          </td>
+          
+
+        <td><%= order.createdAt.toDateString() %></td>
+   
+        <td><%= order.orderItems && order.orderItems.length > 0 ? order.orderItems[0].status : 'N/A' %></td>
+
+        <td><a href="/admin/orders/<%= order.orderId %>">View</a></td>
+      </tr>
+      
+    <% }) %>
+  </tbody>
+</table>
+
+
+  
+
+
+<!-- Pagination -->
+<div style="margin-top: 20px;">
+  <% for (let i = 1; i <= totalPages; i++) { %>
+    <a href="?page=<%= i %>&search=<%= search %>&status=<%= status %>&sort=<%= sort %>">
+      <button <%= i === currentPage ? 'style="font-weight:bold"' : '' %>><%= i %></button>
+    </a>
+  <% } %>
+</div>
+
+
+
+
+
+
+<%- include("../../views/partials/admin/footer") %>
+

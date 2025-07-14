@@ -1,0 +1,22 @@
+<h2>My Orders</h2>
+
+<% if (orders.length === 0) { %>
+  <p>You haven’t placed any orders yet.</p>
+<% } else { %>
+  <table border="1" cellpadding="10" cellspacing="0">
+    <tr>
+      <th>Order ID</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+    <% orders.forEach(order => { %>
+      <tr>
+        <td><%= order.orderId %></td>
+        <td><%= order.createdAt.toDateString() %></td>
+        <td><%= order.orderItems[0].status %></td>
+        <td><a href="/order/<%= order.orderId %>">View Details</a></td>
+      </tr>
+    <% }) %>
+  </table>
+<% } %>
