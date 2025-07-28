@@ -1,6 +1,8 @@
 const Order = require('../../models/orderSchema');
 const User = require('../../models/userSchema'); // if needed for user info
 const Wallet = require('../../models/walletSchema'); // if you have a wallet model
+const Product = require('../../models/productSchema'); // adjust path based on your folder structure
+
 
 //earch, filter, sorting, and pagination.
 
@@ -77,11 +79,26 @@ const updateOrderStatus = async (req, res) => {
 
     if (!order) return res.status(404).send("Order not found now");
 
-    order.orderItems.forEach(item => {
+    for (const item of order.orderItems) {
       item.status = status;
-    });
+
+      if (status === 'Delivered') {
+        const product = await Product.findById(item.product);
+        if (product) {
+          product.stock -= item.quantity;
+          if (product.stock < 0) product.stock = 0; // Prevent negative stock
+          await product.save();
+        }
+      }
+    }
 
     await order.save();
+
+    // order.orderItems.forEach(item => {
+    //   item.status = status;
+    // });
+
+    // await order.save();
 
     res.redirect(`/admin/orders/${order.orderId}`);
   } catch (err) {
@@ -93,163 +110,7 @@ const updateOrderStatus = async (req, res) => {
 
 
 
-// const verifyReturnRequest = async (req, res) => {
 
-//   console.log("⚡ VERIFY RETURN FUNCTION HIT"); 
-//   try {
-//     const { orderId, itemId } = req.params;
-//     console.log('orderId from URL:', orderId);
-//     console.log('itemId from URL:', itemId);
-
-//     const order = await Order.findOne({ orderId });
-//     console.log('Fetched Order:', order);
-
-//     if (!order) return res.status(404).send("Order not found");
-
-//     // Find the specific item
-//     const item = order.orderItems.id(itemId);
-//     if (!item || item.status !== 'Returned') {
-//       return res.status(400).send("Invalid return request");
-//     }
-
-//     const userId = order.user;
-//     const refundAmount = item.finalAmount;
-
-//     let wallet = await Wallet.findOne({ user: userId });
-//     if (!wallet) {
-//       wallet = new Wallet({
-//         user: userId,
-//         balance: 0,
-//         transactions: [],
-//       });
-//     }
-
-//     wallet.balance += refundAmount;
-//     wallet.transactions.push({
-//       amount: refundAmount,
-//       type: 'credit',
-//       description: `Refund for returned item in order ${orderId}`,
-//     });
-
-//     item.status = 'Refunded';
-
-//     await wallet.save();
-//     await order.save();
-
-//     res.redirect(`/admin/orders/${orderId}`);
-//   } catch (err) {
-//     console.error("Error verifying return:", err);
-//     res.status(500).send("Internal Server Error");
-//   }
-// };
-
-
-// const verifyReturnRequest = async (req, res) => {
-//   console.log("⚡ VERIFY RETURN FUNCTION HIT");
-//   try {
-//     const { orderId, itemId } = req.params;
-//     console.log('orderId from URL:', orderId);
-//     console.log('itemId from URL:', itemId);
-
-//     // Correct: search by orderId (UUID string)
-//     const order = await Order.findOne({ orderId });
-//     console.log('Fetched Order:', order);
-
-//     if (!order) return res.status(404).send("Order not found");
-
-//     // Find the specific item by its _id (itemId should be ObjectId string)
-//     const item = order.orderItems.id(itemId);
-//     if (!item) {
-//       return res.status(400).send("Order item not found");
-//     }
-//     if (item.status !== 'Returned') {
-//       return res.status(400).send("Invalid return request");
-//     }
-
-//     const userId = order.user;
-//     const refundAmount = item.finalAmount;
-
-//     let wallet = await Wallet.findOne({ user: userId });
-//     if (!wallet) {
-//       wallet = new Wallet({
-//         user: userId,
-//         balance: 0,
-//         transactions: [],
-//       });
-//     }
-
-//     wallet.balance += refundAmount;
-//     wallet.transactions.push({
-//       amount: refundAmount,
-//       type: 'credit',
-//       description: `Refund for returned item in order ${orderId}`,
-//     });
-
-//     item.status = 'Refunded';
-
-//     await wallet.save();
-//     await order.save();
-
-//     res.redirect(`/admin/orders/${orderId}`);
-//   } catch (err) {
-//     console.error("Error verifying return:", err);
-//     res.status(500).send("Internal Server Error");
-//   }
-// };
-
-// const verifyReturnRequest = async (req, res) => {
-//   console.log("⚡ VERIFY RETURN FUNCTION HIT");
-//   try {
-//     const { orderId, itemId } = req.params;
-//     const isRejected = req.query.reject === 'true';
-
-//     const order = await Order.findOne({ orderId });
-//     if (!order) return res.status(404).send("Order not found");
-
-//     const item = order.orderItems.id(itemId);
-//     if (!item) return res.status(400).send("Order item not found");
-
-//     if (item.status !== 'Returned') {
-//       return res.status(400).send("Invalid return request");
-//     }
-
-//     if (isRejected) {
-//       item.status = 'Return Rejected';
-//       await order.save();
-//       return res.status(200).send("Return request rejected");
-//     }
-
-//     // Refund process
-//     const userId = order.user;
-//     const refundAmount = item.finalAmount;
-
-//     let wallet = await Wallet.findOne({ user: userId });
-//     if (!wallet) {
-//       wallet = new Wallet({
-//         user: userId,
-//         balance: 0,
-//         transactions: [],
-//       });
-//     }
-
-//     wallet.balance += refundAmount;
-//     wallet.transactions.push({
-//       amount: refundAmount,
-//       type: 'credit',
-//       description: `Refund for returned item in order ${orderId}`,
-//     });
-
-//     item.status = 'Refunded';
-
-//     await wallet.save();
-//     await order.save();
-
-//     res.redirect(`/admin/orders/${orderId}`);
-//   } catch (err) {
-//     console.error("Error verifying return:", err);
-//     res.status(500).send("Internal Server Error");
-//   }
-// };
 
 const verifyReturnRequest = async (req, res) => {
   console.log("⚡ VERIFY RETURN FUNCTION HIT");

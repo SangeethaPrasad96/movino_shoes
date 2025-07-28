@@ -8,6 +8,7 @@ const crypto = require('crypto');
 const Category = require('../../models/categorySchema');
 const Address = require('../../models/addressSchema'); 
 const Cart = require('../../models/cartSchema');
+const Wallet = require('../../models/walletSchema');
 
 
 
@@ -950,24 +951,46 @@ const editAddressCheckout = async (req, res) => {
 //wallet
 
 
-const walletPage = async (req, res) => {
-  try {
+// const walletPage = async (req, res) => {
+//   try {
 
-      const userId = req.session.user._id;
-      const user = await User.findById(userId); 
+//       const userId = req.session.user._id;
+//       const user = await User.findById(userId); 
 
-      if (!user) {
-        return res.redirect('/login'); // or any fallback
-      }
+//       if (!user) {
+//         return res.redirect('/login'); // or any fallback
+//       }
 
     
 
-      res.render('wallet', { user });
-  } catch (error) {
-      console.error('Error loading wallet:', error);
-      res.redirect('/profile'); // fallback
+//       res.render('wallet', { user });
+//   } catch (error) {
+//       console.error('Error loading wallet:', error);
+//       res.redirect('/profile'); // fallback
+//   }
+// };
+
+
+
+
+const walletPage = async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+
+    const wallet = await Wallet.findOne({ user: userId });
+
+    res.render('wallet', {
+      user: req.session.user,
+      balance: wallet?.balance || 0,
+      transactions: wallet?.transactions || []
+    });
+
+  } catch (err) {
+    console.error('❌ Error loading wallet page:', err);
+    res.status(500).send('Server error loading wallet');
   }
 };
+
 
 
 module.exports = {
