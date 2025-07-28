@@ -42,18 +42,19 @@ const categorySchema = new mongoose.Schema({
       required: true,
     },
     image: {
-      type: String, // or an array if you want multiple images
+      type: String, 
       required: true,
     },
     isDeleted: {
       type: Boolean,
       default: false,
     },
-    status: {
-      type: String,
-      enum: ['listed', 'unlisted'],  // For listed and unlisted status
-      default: 'listed',  // Default to 'listed'
-    },
+    isBlocked: { type: Boolean, default: false },
+    // status: {
+    //   type: String,
+    //   enum: ['listed', 'unlisted'],  // For listed and unlisted status
+    //   default: 'listed',  // Default to 'listed'
+    // },
   },
   { timestamps: true } // for createdAt and updatedAt
 );

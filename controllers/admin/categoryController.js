@@ -31,21 +31,6 @@ const getCategories = async (req, res) => {
   });
 };
 
-// const addCategoryPage = (req, res) => {
-//   res.render("addCategory");
-// };
-
-// const addCategory = async (req, res) => {
-//   const { categoryName, subCategory } = req.body;
-//   const image = req.file ? req.file.filename : null;
-
-//   await Category.create({ categoryName, subCategory, image });
-//   req.flash('successMessage', 'Category added successfully!');
-//   res.redirect("/admin/categories");
- 
-
-
-// };
 
 // GET: Render Add Category Page
 const addCategoryPage = (req, res) => {
@@ -64,7 +49,7 @@ const addCategory = async (req, res) => {
     await Category.create({ categoryName, subCategory, image });
 
     req.flash('successMessage', 'Category added successfully!');
-    res.redirect("/admin/categories/add"); // redirect back to form if you want to show alert here
+    res.redirect("/admin/categories"); // redirect back to form if you want to show alert here
   } catch (error) {
     console.error("Error adding category:", error);
     req.flash('errorMessage', 'Something went wrong!');
@@ -91,10 +76,7 @@ const editCategory = async (req, res) => {
   res.redirect("/admin/categories");
 };
 
-// const softDeleteCategory = async (req, res) => {
-//   await Category.findByIdAndUpdate(req.params.id, { isDeleted: true });
-//   res.json({ success: true });
-// };
+
 
 
 const softDeleteCategory = async (req, res) => {
@@ -104,7 +86,7 @@ const softDeleteCategory = async (req, res) => {
     if (category) {
       // Also mark all products under this category as deleted
       await Product.updateMany(
-        { category: category.categoryName },
+        { category: category._id  },
        
         { $set: { isDeleted: true } }
      
@@ -128,31 +110,11 @@ const recoveryPage = async (req, res) => {
   res.render("recovery", { deletedCategories });
 };
 
-// Add if you want recover functionality too
-// const recoverCategory = async (req, res) => {
-//   await Category.findByIdAndUpdate(req.params.id, { isDeleted: false });
-//   res.redirect("/admin/categories");
-// };
 
-
-// const recoverCategory = async (req, res) => {
-//   const category = await Category.findByIdAndUpdate(req.params.id, { isDeleted: false }, { new: true });
-
-//   if (category) {
-    
-//     await Product.updateMany(
-//       { category: category.categoryName },
-//       { $set: { isDeleted: false } }
-     
-//     );
-//   }
-
-//   res.redirect("/admin/categories");
-// };
 const recoverCategory = async (req, res) => {
   try {
 
-    console.log("recoverCategory function called with ID:", req.params.id);
+    // console.log("recoverCategory function called with ID:", req.params.id);
     // Recover the category
     const category = await Category.findByIdAndUpdate(
       req.params.id,
@@ -166,17 +128,17 @@ const recoverCategory = async (req, res) => {
     }
 
     // Debug: Log the recovered category name
-    console.log("Recovered category name:", category.categoryName);
+    console.log("Recovered category name:", category._id);
 
     // Recover all related products (case-insensitive match)
     const updatedProductsResult = await Product.updateMany(
-      { category: { $regex: new RegExp(`^${category.categoryName}$`, "i") } }, // Case-insensitive match
+      { category: { $regex: new RegExp(`^${category._id}$`, "i") } }, // Case-insensitive match
       { $set: { isDeleted: false } }
     );
 
     // Debug: Log the number of updated products
     console.log(
-      `Products updated for category (${category.categoryName}):`,
+      `Products updated for category (${category._id}):`,
       updatedProductsResult.modifiedCount
     );
 
@@ -191,6 +153,33 @@ const recoverCategory = async (req, res) => {
 
 
 
+// Block Category
+const blockCategory = async (req, res) => {
+  try {
+    const category = req.params.id;
+   
+    await Category.findByIdAndUpdate(category, { isBlocked: true });
+    res.redirect('/admin/categories');
+  } catch (err) {
+    console.error('Error blocking category:', err);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// Unblock Category
+const unblockCategory = async (req, res) => {
+  try {
+    const category = req.params.id;
+
+    await Category.findByIdAndUpdate(category, { isBlocked: false });
+    res.redirect('/admin/categories');
+  } catch (err) {
+    console.error('Error unblocking category:', err);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
 
 module.exports = {
   getCategories,
@@ -201,5 +190,8 @@ module.exports = {
   softDeleteCategory,
   recoveryPage,
   recoverCategory,
+  blockCategory,
+  unblockCategory,
+
 
 };

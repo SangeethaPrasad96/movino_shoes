@@ -30,8 +30,11 @@
         <label>Category</label>
         <select name="category" class="form-select" required>
           <option value="">-- Select Category --</option>
-          <option value="Men">Men</option>
-          <option value="Women">Women</option>
+          <% categories.forEach(category => { %>
+      <option value="<%= category._id %>"><%= category.categoryName %></option>
+    <% }); %>
+          <!-- <option value="Men">Men</option>
+          <option value="Women">Women</option> -->
         </select>
       </div>
 

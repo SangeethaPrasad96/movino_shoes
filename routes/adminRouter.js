@@ -46,23 +46,18 @@ router.patch("/users/:id/block", customerController.toggleBlockUser);
 
 
 
-// Setup multer for file upload
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//       cb(null, "public/uploads/categories");
-//     },
-//     filename: function (req, file, cb) {
-//       cb(null, Date.now() + path.extname(file.originalname));
-//     },
-//   });
-//   const upload = multer({ storage });
+
 
 
 
 
 //============category management===========//
 
-// List, Search, Pagination
+// List, Search, Pagination,block,unblock
+
+
+
+
 router.get("/categories", adminAuth,categoryController.getCategories);
 
 // Add category
@@ -90,14 +85,9 @@ router.get('/categories/deleted',adminAuth, async (req, res) => {
     res.render('deletedCategories', { deletedCategories });
   });
   
-  // Recover a category
-  // router.get('/categories/recover/:id',adminAuth, async (req, res) => {
-  //   await Category.findByIdAndUpdate(req.params.id, { isDeleted: false });
-  //   res.redirect('/admin/categories/deleted');
-  // });
-  
 
-//debug
+
+
 router.get('/categories/recover/:id', adminAuth, async (req, res) => {
   try {
     // Recover the category
@@ -109,7 +99,7 @@ router.get('/categories/recover/:id', adminAuth, async (req, res) => {
 
     // Recover related products
     await Product.updateMany(
-      { category: category.categoryName },
+      { category: category._id },
       { $set: { isDeleted: false } }
     );
 
@@ -123,6 +113,8 @@ router.get('/categories/recover/:id', adminAuth, async (req, res) => {
 
 
 
+router.post('/categories/block/:id', categoryController.blockCategory);
+router.post('/categories/unblock/:id', categoryController.unblockCategory);
 
 
 
@@ -155,6 +147,8 @@ router.post('/products/recover/:id', adminAuth, productController.recoverProduct
 
 
 
+router.post('/products/block/:id', productController.blockProducts);
+router.post('/products/unblock/:id', productController.unblockProducts);
 
 
 

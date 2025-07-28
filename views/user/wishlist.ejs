@@ -135,6 +135,53 @@
 						</div>
 					</div>
 				</div>
+
+
+
+
+				<div class="container py-5">
+					<h2 class="text-center mb-4">Your Wishlist</h2>
+				  
+				
+						<% if (wishlist && wishlist.items && wishlist.items.length > 0) { %>
+
+					  <div class="row">
+						<% wishlist.items.forEach(item => { 
+							 const product = item.productId;
+						%>
+						  <div class="col-md-4 mb-4">
+							<div class="card position-relative">
+							  
+							  <!-- ❌ Remove Icon Inside Image -->
+							  <a href="/wishlist/remove/<%= product._id %>" 
+								 class="position-absolute top-0 end-0 m-2 text-danger"
+								 style="font-size: 20px;">
+								&times;
+							  </a>
+				  
+							  <img src="/uploads/products/<%= product.images[0] %>" class="card-img-top" alt="<%= product.name %>">
+							  
+							  <div class="card-body text-center">
+								<h5 class="card-title"><%= product.name %></h5>
+								<p class="card-text">₹<%= product.price %></p>
+				  
+								<!-- Go to Bag button (adds to cart) -->
+								<form action="/cart/add/<%= product._id %>" method="POST">
+								  <button type="submit" class="btn text-white" style="background-color: #339999;">Go to Bag</button>
+								</form>
+							  </div>
+							</div>
+						  </div>
+						<% }); %>
+					  </div>
+					<% } else { %>
+					  <p class="text-center text-muted">Your wishlist is empty.</p>
+					<% } %>
+				  </div>
+				  
+
+
+<!-- 				
 				<div class="row row-pb-lg">
 					<div class="col-md-12">
 						<div class="product-name d-flex">
@@ -297,7 +344,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 		<footer id="colorlib-footer" role="contentinfo">
 			<div class="container">

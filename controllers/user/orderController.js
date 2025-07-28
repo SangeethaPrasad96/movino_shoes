@@ -2,14 +2,14 @@ const Order = require('../../models/orderSchema');
 const Product = require('../../models/productSchema');
 const Cart = require('../../models/cartSchema');
 const { v4: uuidv4 } = require('uuid'); // ensure this is at the top
-
+const PDFDocument = require('pdfkit');
 
 //order complete
 
 const placeOrder = async (req, res) => {
   try {
     const userId = req.session.user?._id;
-    console.log("Session object:", req.session);
+    // console.log("Session object:", req.session);
 
     if (!userId) {
       return res.status(401).send("User not authenticated");
@@ -50,7 +50,7 @@ const placeOrder = async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
-    console.log("Saved Order:", savedOrder);
+    // console.log("Saved Order:", savedOrder);
 
     // Clear Cart
     await Cart.deleteOne({ _id: cart._id });
@@ -95,20 +95,112 @@ const getOrderCompletePage = async (req, res) => {
 
   
 
+// const returnOrder = async (req, res) => {
+//     const reason = req.body.reason;
+//     const order = await Order.findById(req.params.orderId);
+  
+//     if (!reason) return res.status(400).send('Reason required');
+  
+//     order.status = 'Returned';
+//     order.returnReason = reason;
+  
+//     await order.save();
+  
+//     res.redirect(`/order/${order.orderId}`);
+//   };
+
+
+
+// const returnOrder = async (req, res) => {
+//   console.log("⚡ VERIFY RETURN order FUNCTION HIT");
+//   try {
+//     const { reason } = req.body;
+//     const order = await Order.findOne({ orderId: req.params.orderId });
+
+    
+//     // const { itemId } = req.body;
+
+//     console.log('orderId from URL:', req.params.orderId);
+//     // console.log('itemId from URL:', req.params.itemId); // if you are sending itemId
+    
+
+
+
+//     if (!order) {
+//       return res.status(404).send('Order not found here ');
+//     }
+
+//     if (!reason || reason.trim() === "") {
+//       return res.status(400).send('Return reason is required');
+//     }
+
+//     if (order.status !== 'Delivered') {
+//       return res.status(400).send('Only delivered orders can be returned');
+//     }
+
+//     if (order.returnRequest && order.returnRequest.status === 'Pending') {
+//       return res.status(400).send('Return request already submitted');
+//     }
+
+//     // Add return request object
+//     order.returnRequest = {
+//       reason: reason.trim(),
+//       status: 'Pending', // admin will verify and update this
+//       requestedAt: new Date(),
+//     };
+
+//     await order.save();
+
+//     res.redirect(`/orders/${order.orderId}`); // adjust URL if different
+//   } catch (err) {
+//     console.error('Error in returnOrder:', err);
+//     res.status(500).send('Something went wrong');
+//   }
+// };
+
 const returnOrder = async (req, res) => {
-    const reason = req.body.reason;
-    const order = await Order.findById(req.params.orderId);
-  
-    if (!reason) return res.status(400).send('Reason required');
-  
-    order.status = 'Returned';
-    order.returnReason = reason;
-  
+  console.log("⚡ VERIFY RETURN order FUNCTION HIT");
+  try {
+    const { reason } = req.body;
+    const { orderId, itemId } = req.params;
+    // Get the order using orderId from the URL
+    const order = await Order.findOne({ orderId });
+
+
+console.log("order id is" ,order)
+console.log("item id is" ,itemId)
+
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+
+    // Find the specific item inside the order
+    const item = order.orderItems.find(item => item._id.toString() === itemId);
+
+    if (!item) {
+      return res.status(404).send('Item not found in order');
+    }
+
+    // Only allow return if status is Delivered
+    if (item.status !== 'Delivered') {
+      return res.status(400).send('Only delivered items can be returned');
+    }
+
+    // Mark the item as returned and store reason
+    item.returnRequested = true;
+    item.returnReason = reason;
+    item.status = 'Return Request'; // optional
+
+    // Save the updated order
     await order.save();
-  
-    res.redirect(`/order/${order.orderId}`);
-  };
-  const PDFDocument = require('pdfkit');
+
+    return res.status(200).send('Return request submitted successfully');
+  } catch (error) {
+    console.error("❌ Error in returnOrder:", error);
+    return res.status(500).send('Server error');
+  }
+};
+
 
 const downloadInvoice = async (req, res) => {
 //   const order = await Order.findById(req.params.orderId).populate('products.productId');
@@ -138,7 +230,7 @@ const downloadInvoice = async (req, res) => {
 };
 
 
-// const searchOrders = async (req, res) => {
+
 //     const q = req.query.q;
 //     const orders = await Order.find({
 //       orderId: { $regex: q, $options: 'i' },
@@ -186,12 +278,49 @@ const getUserOrders = async (req, res) => {
 
 
 //order detail
+// const cancelOrderItem = async (req, res) => {
+//   try {
+//     const { orderId, itemId } = req.params;
+//     const reason = req.body.reason || 'No reason given';
+
+//     const order = await Order.findById(orderId);
+//     if (!order) return res.status(404).send('Order not found');
+
+//     const item = order.orderItems.id(itemId);
+//     if (!item) return res.status(404).send('Item not found');
+
+//     // Check if already cancelled
+//     if (item.status === 'Cancelled') {
+//       return res.status(400).send('Item already cancelled');
+//     }
+
+//     item.status = 'Cancelled';
+
+//     // Optional: Save cancellation reason somewhere
+//     item.cancellationReason = reason;
+
+//     // ✅ Increment product stock
+//     const product = await Product.findById(item.product);
+//     if (product) {
+//       product.stock += item.quantity;
+//       await product.save();
+//     }
+
+//     await order.save();
+//     res.redirect(`/order/${order.orderId}`);
+//   } catch (err) {
+//     console.error("Error cancelling item:", err);
+//     res.status(500).send("Internal server error");
+//   }
+// };
+
 const cancelOrderItem = async (req, res) => {
   try {
     const { orderId, itemId } = req.params;
     const reason = req.body.reason || 'No reason given';
 
-    const order = await Order.findById(orderId);
+    // ✅ FIXED: Use findOne with orderId field instead of findById
+    const order = await Order.findOne({ orderId });
     if (!order) return res.status(404).send('Order not found');
 
     const item = order.orderItems.id(itemId);
@@ -215,6 +344,8 @@ const cancelOrderItem = async (req, res) => {
     }
 
     await order.save();
+    
+    // ✅ This is already correct - using order.orderId
     res.redirect(`/order/${order.orderId}`);
   } catch (err) {
     console.error("Error cancelling item:", err);
@@ -223,11 +354,9 @@ const cancelOrderItem = async (req, res) => {
 };
 
 
-
-
 const getOrderDetails = async (req, res) => {
   try {
-    console.log("Looking for orderId:", req.params.orderId); // ✅ Log inpu
+    // console.log("Looking for orderId:", req.params.orderId); // ✅ Log inpu
     const order = await Order.findOne({ orderId: req.params.orderId }).populate('orderItems.product');
 
     console.log("Order fetched from DB:", order); // ✅ Log result

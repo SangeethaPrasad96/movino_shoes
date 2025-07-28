@@ -33,8 +33,12 @@
                   <td><%= cat.categoryName %></td>
                   <td><%= cat.subCategory %></td>
                   <td>
+
+               
+
                     <% if (cat.image) { %>
-                      <img src="/uploads/<%= cat.image %>" alt="Category Image" width="80" height="50" class="img-fluid rounded" />
+                      <img src="/uploads/categories/<%= cat.image %>" alt="Category Image" width="80" height="50" class="img-fluid rounded" />
+                    
                     <% } else { %>
                       No Image
                     <% } %>

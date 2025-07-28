@@ -100,14 +100,11 @@ const productSchema = new mongoose.Schema({
      required: true,
      index: true},
 
-    //  category:{
-    //           type:Schema.Types.ObjectId,
-    //           ref:"Category",
-    //           required:true,
-    //       },
-  category: 
-  { type: String, 
-    required: true },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category'
+  },
+
   subcategory: 
   { type: String, 
     required: true },
@@ -132,6 +129,9 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isBlocked: { 
+    type: Boolean, 
+    default: false },
   status: {
     type: String,
     enum: ['Active', 'Inactive'],

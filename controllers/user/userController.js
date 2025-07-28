@@ -423,11 +423,31 @@ const getShopPage = async (req, res) => {
 const getProductDetail = async (req, res) => {
   try {
     const productId = req.params.id;
-    const product = await Product.findById(productId).lean();
+  
+
+    const product = await Product.findById(productId)
+    .populate('category')  // <<-- This is key to access isBlocked from category
+    .lean();
+
+    // console.log("Product Details:", product);
+    // console.log("Category Details:", product.category); // populated category
+    
 
     if (!product) {
       return res.status(404).render('404', { message: 'Product not found' });
     }
+
+
+
+
+// console.log("✅ Product:", product);
+// console.log("🔍 categoryId raw value:", product.category);
+
+// Check if categoryId is missing
+if (!product.category) {
+  console.warn("⚠️ Product has no valid categoryId or category not found.");
+}
+
 
     res.render('product-detail', { product });
   } catch (err) {
@@ -497,7 +517,7 @@ const sendOtpMail = async (email, otp) => {
 
 
 const loadForgotPassword = (req, res) => {
-    res.render("forgotPassword"); // You will create this EJS file
+    res.render("forgotPassword"); 
 };
 
 const handleForgotPassword = async (req, res) => {
@@ -681,28 +701,68 @@ const verifyEmailOTP = async (req, res) => {
 
 
 // password
+
+
+
+// const changePassword = async (req, res) => {
+//   try {
+//       const { currentPassword, newPassword } = req.body;
+
+//       const user = await User.findById(req.user.id);
+//       if (!user) {
+//           return res.status(404).json({ success: false, message: 'User not found' });
+//       }
+
+//       if (!user.password) {
+//           return res.status(400).json({ success: false, message: 'Password change not supported for this account (e.g., Google login)' });
+//       }
+
+//       const isMatch = await bcrypt.compare(currentPassword, user.password);
+//       if (!isMatch) {
+//           return res.status(400).json({ success: false, message: 'Incorrect current password' });
+//       }
+
+//       const hashedPassword = await bcrypt.hash(newPassword, 10);
+//       user.password = hashedPassword;
+
+//       await user.save();
+
+//       res.json({ success: true, message: 'Password changed successfully' });
+
+//   } catch (error) {
+//       console.error('Change Password Error:', error);
+//       res.status(500).json({ success: false, message: 'Server error' });
+//   }
+// };
+
 const changePassword = async (req, res) => {
-    try {
-        const { currentPassword, newPassword } = req.body;
-        const user = await User.findById(req.user.id);
+  try {
+      const { currentPassword, newPassword } = req.body;
 
-        // Validate current password
-        const isMatch = await bcrypt.compare(currentPassword, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ success: false, message: 'Incorrect current password' });
-        }
+      if (!currentPassword || !newPassword) {
+          return res.status(400).json({ success: false, message: 'Please provide all fields' });
+      }
 
-        // Hash and update new password
-        user.password = await bcrypt.hash(newPassword, 10);
-        await user.save();
+      if (newPassword.length < 6) {
+          return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+      }
 
-        res.json({ success: true, message: 'Password changed successfully' });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
+      const user = req.user;
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+          return res.status(400).json({ success: false, message: 'Incorrect current password' });
+      }
+
+      user.password = await bcrypt.hash(newPassword, 10);
+      await user.save();
+
+      res.json({ success: true, message: 'Password changed successfully' });
+  } catch (error) {
+      console.error('Change Password Error:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
+  }
 };
-
-
 
 //address
 
@@ -887,6 +947,28 @@ const editAddressCheckout = async (req, res) => {
 
   
 
+//wallet
+
+
+const walletPage = async (req, res) => {
+  try {
+
+      const userId = req.session.user._id;
+      const user = await User.findById(userId); 
+
+      if (!user) {
+        return res.redirect('/login'); // or any fallback
+      }
+
+    
+
+      res.render('wallet', { user });
+  } catch (error) {
+      console.error('Error loading wallet:', error);
+      res.redirect('/profile'); // fallback
+  }
+};
+
 
 module.exports = {
     loadHomepage,
@@ -921,7 +1003,8 @@ module.exports = {
     checkoutPage,
     saveAddress,
     editAddressCheckout,
-    uploadProfileImage
+    uploadProfileImage,
+    walletPage
    
 
 

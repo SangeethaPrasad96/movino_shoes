@@ -21,47 +21,7 @@
 
       <div class="table-responsive">
         <table class="table table-bordered table-striped text-center align-middle">
-          <!-- <thead class="table-dark">
-            <tr>
-              <th>Sl. No</th>
-              <th>Product</th>
-              <th>Images</th>
-              <th>Category</th>
-              <th>Subcategory</th>
-              <th>Price (₹)</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (products.length === 0) { %>
-              <tr><td colspan="8">No products added.</td></tr>
-            <% } else { %>
-              <% products.forEach((p, index) => { %>
-                <tr>
-                  <td><%= index + 1 + ((currentPage - 1) * 5) %></td>
-                  <td><%= p.name %></td>
-                  <td>
-                    <% p.images.forEach(img => { %>
-                      <img src="/uploads/products/<%= img %>" width="50" height="40" class="m-1 rounded shadow-sm">
-                    <% }) %>
-                  </td>
-                  <td><%= p.category %></td>
-                  <td><%= p.subcategory %></td>
-                  <td>₹<%= p.price %></td>
-                  <td>
-                    <span class="badge <%= p.isDeleted ? 'bg-danger' : 'bg-success' %>">
-                      <%= p.isDeleted ? 'Inactive' : 'Active' %>
-                    </span>
-                  </td>
-                  <td>
-                    <a href="/admin/products/edit/<%= p._id %>" class="btn btn-warning btn-sm">✏️ Edit</a>
-                    <a href="/admin/products/delete/<%= p._id %>" class="btn btn-danger btn-sm">🗑️  Delete</a>
-                  </td>
-                </tr>
-              <% }) %>
-            <% } %>
-          </tbody> -->
+          
 
 
 
@@ -90,15 +50,10 @@
                       <img src="/uploads/products/<%= img %>" width="50" height="40" class="m-1 rounded shadow-sm">
                     <% }) %>
                   </td>
-                  <!-- <td>
-                    <% if (p.images.length > 0) { %>
-                      <img src="/uploads/products/<%= p.images[0] %>" width="50" height="40" class="m-1 rounded shadow-sm">
-                    <% } else { %>
-                      <span class="text-muted">No Image</span>
-                    <% } %> -->
-                  <!-- </td> -->
+                 
                   <td><%= p.name %></td>
-                  <td><%= p.category %></td>
+                  <td><%= p.category ? p.category.categoryName : "" %></td>
+               
                   <td><%= p.subcategory %></td>
                   <td>₹<%= p.price %></td>
                   <td><%= p.stock %></td>
@@ -111,9 +66,27 @@
                       <span class="badge bg-success">In Stock</span>
                     <% } %>
                   </td>
+
+
                   <td>
                     <a href="/admin/products/edit/<%= p._id %>" class="btn btn-warning btn-sm">✏️ Edit</a>
+                    <% if (!p.isDeleted) { %>
+                      <% if (p.isBlocked) { %>
+                        <form action="/admin/products/unblock/<%= p._id %>" method="POST" class="d-inline">
+                          <button type="submit" class="btn btn-success btn-sm mb-1">Unblock</button>
+                        </form>
+                      <% } else { %>
+                        <form action="/admin/products/block/<%= p._id %>" method="POST" class="d-inline">
+                          <button type="submit" class="btn btn-secondary btn-sm mb-1">Block</button>
+                        </form>
+                       <% } %>
+
+
+
+                   
                     <a href="/admin/products/delete/<%= p._id %>" class="btn btn-danger btn-sm">🗑️ Delete</a>
+                    <% } %>
+
                   </td>
                 </tr>
               <% }) %>
@@ -122,7 +95,8 @@
           
 
         </table>
-      </div>
+                                    
+                                           
 
       <!-- Pagination -->
       <nav>

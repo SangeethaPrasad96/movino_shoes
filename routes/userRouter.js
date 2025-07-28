@@ -6,7 +6,7 @@ const productController = require('../controllers/admin/productController');
 const cartController = require('../controllers/user/cartController');
 const wishlistController = require('../controllers/user/wishlistController');
 const orderController = require('../controllers/user/orderController');
-const walletController = require('../controllers/user/walletController');
+
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -127,6 +127,9 @@ router.get('/wishlist/add/:id', userAuth,wishlistController.addToWishlist);
 router.post('/wishlist/remove/:id', userAuth,wishlistController.removeFromWishlist);
 
 
+
+
+
 //checkout
 
 router.get('/checkout', userAuth, userController.checkoutPage);
@@ -154,7 +157,10 @@ router.post('/cancel-item/:orderId/:itemId', userAuth, orderController.cancelOrd
 router.get('/my-orders', userAuth, orderController.getUserOrders);
 
 
-router.post('/return-order/:orderId', userAuth, orderController.returnOrder);
+// router.post('/return-order/:orderId', userAuth, orderController.returnOrder);//return request
+router.post('/return-order/:orderId/:itemId', userAuth, orderController.returnOrder);
+
+
 router.get('/invoice/:orderId', userAuth, orderController.downloadInvoice);
 router.get('/search-order', userAuth, orderController.searchOrder);
 
@@ -167,9 +173,8 @@ router.get('/search-order', userAuth, orderController.searchOrder);
 
 
 
-router.get('/wallet',userAuth, walletController.getWallet); 
 
-
+router.get('/wallet', userController.walletPage);
 
 
 module.exports = router;

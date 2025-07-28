@@ -120,23 +120,6 @@ const orderItemSchema = new Schema({
   }
 });
 
-// const orderSchema = new Schema({
-//   orderId: {
-//     type: String,
-//     default: () => uuidv4(),
-//     unique: true
-//   },
-//   user: {
-//     type: Schema.Types.ObjectId,
-//     ref: 'User',
-//     required: true
-//   },
-//   orderItems: [orderItemSchema],
-//   createdAt: {
-//     type: Date,
-//     default: Date.now
-//   }
-// });
 
 const orderSchema = new Schema({
    orderId: {
@@ -191,7 +174,7 @@ const orderSchema = new Schema({
      status: {
        type: String,
        required: true,
-      //  enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned']
+      //  enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned','Return Approved', 'Return Rejected']
       enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned', 'Refunded']
      },
      createdOn: {
@@ -206,12 +189,26 @@ const orderSchema = new Schema({
      cancellationReason: {
       type: String,
       default: 'none'
+    },
+    returnRequest: {
+      reason: String,
+      status: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Rejected'],
+        default: 'Pending',
+      },
+      requestedAt: Date,
+      verifiedAt: Date,
     }
    }],
    createdAt: {
      type: Date,
      default: Date.now
-   }
+   },
+
+  
+  
+   
  });
  
 

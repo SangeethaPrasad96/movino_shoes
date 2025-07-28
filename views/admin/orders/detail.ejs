@@ -1,4 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 
 
@@ -22,17 +24,21 @@
         <td><%= item.product.name %></td>
         <td><%= item.quantity %></td>
         <td><%= item.status %></td>
+     
         <td>
-            <% if (item.status === 'Returned') { %>
-                <form method="POST" action="/admin/orders/verify-return/<%= order.orderId %>/<%= item._id %>">
-                  <button type="submit">Verify Refund</button>
-                </form>
-              <% } else if (item.status === 'Refunded') { %>
-                Refunded
-              <% } else { %>
-                -
-              <% } %>
+          <% if (item.status === 'Return Request' || item.status === 'Returned') { %>
+            <form id="verifyForm-<%= item._id %>" method="POST" action="/admin/orders/verify-return/<%= order.orderId %>/<%= item._id %>" style="display:inline;">
+              <input type="hidden" name="action" id="action-<%= item._id %>" value="">
+              <button type="button" onclick="showPopup('<%= item._id %>')">Verify Refund</button>
+            </form>
+          <% } else if (item.status === 'Refunded') { %>
+            Refunded
+          <% } else { %>
+            -
+          <% } %>
         </td>
+        
+        
       </tr>
     <% }) %>
   </tbody>
@@ -52,6 +58,35 @@
   </select>
   <button type="submit">Update</button>
 </form>
+
+
+<script>
+  function showPopup(itemId) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Accept return and refund to wallet?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Accept',
+      cancelButtonText: 'Reject',
+      reverseButtons: true
+    }).then((result) => {
+      const form = document.getElementById(`verifyForm-${itemId}`);
+      const actionInput = document.getElementById(`action-${itemId}`);
+
+      if (result.isConfirmed) {
+        actionInput.value = 'accept';
+        form.submit();
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        actionInput.value = 'reject';
+        form.submit();
+      }
+    });
+  }
+</script>
+
+
+
 
 
 <%- include("../../views/partials/admin/footer") %>

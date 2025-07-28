@@ -313,12 +313,17 @@ async function verifyOTP() {
     const data = await response.json();
 
     if (data.success) {
-        Swal.fire('Success', 'Email updated!', 'success');
-        closeEmailModal();
-        // document.querySelector('strong').innerText = email;
-    } else {
-        Swal.fire('Error', data.message || 'Invalid OTP', 'error');
+    Swal.fire('Success', 'Email updated successfully!', 'success');
+    
+    // Update email in the visible DOM
+    const emailText = document.querySelector('p strong');
+    if (emailText) {
+        emailText.textContent = data.updatedEmail; // assuming backend returns updated email
     }
+
+    closeEmailModal();
+}
+
 }
 
 
@@ -330,29 +335,52 @@ async function verifyOTP() {
     // password
 
     document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const currentPassword = document.getElementById('currentPassword').value;
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+    e.preventDefault();
 
-        if (newPassword !== confirmNewPassword) {
-            Swal.fire('Error', 'Passwords do not match!', 'error');
-            return;
-        }
+    const currentPassword = document.getElementById('currentPassword').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
 
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+        Swal.fire('Error', 'All password fields are required!', 'error');
+        return;
+    }
+
+    if (newPassword.length < 6) {
+        Swal.fire('Error', 'New password must be at least 6 characters long.', 'error');
+        return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+        Swal.fire('Error', 'New passwords do not match!', 'error');
+        return;
+    }
+
+    // Send to backend
+    try {
         const response = await fetch('/change-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ currentPassword, newPassword })
         });
+
         const data = await response.json();
 
         if (data.success) {
-            Swal.fire('Success', 'Password changed successfully!', 'success');
+            Swal.fire('Success', data.message, 'success').then(() => {
+                window.location.href = '/profile';
+            });
         } else {
             Swal.fire('Error', data.message, 'error');
         }
-    });
+    } catch (error) {
+        Swal.fire('Error', 'Something went wrong. Please try again.', 'error');
+    }
+});
+
+
+
+
 
 
 
@@ -469,6 +497,8 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 <script src="js/main.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 
 
 

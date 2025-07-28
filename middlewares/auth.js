@@ -29,6 +29,7 @@ const userAuth = (req, res, next) => {
         User.findById(req.session.user)
             .then(user => {
                 if (user && !user.isBlocked) {
+                    req.user = user;
                     next();
                 } else {
                     // User is blocked — destroy session and redirect
@@ -37,7 +38,7 @@ const userAuth = (req, res, next) => {
                             console.log("Error destroying session:", err);
                             return res.status(500).send("Something went wrong");
                         }
-                        res.redirect("/login"); // Optionally, you can add a flash message here
+                        res.redirect("/login"); 
                     });
                 }
             })

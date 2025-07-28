@@ -30,11 +30,17 @@
             <td>
               <% if (item.status === 'Pending' || item.status === 'Processing') { %>
                 <form action="/cancel-item/<%= order._id %>/<%= item._id %>" method="POST" style="display:inline;">
+
                   <input type="text" name="reason" placeholder="Reason (optional)" />
                   <button type="submit">Cancel</button>
                 </form>
               <% } else if (item.status === 'Delivered') { %>
-                <form action="/return-order/<%= order._id %>" method="POST" style="display:inline;">
+              
+                 
+                    <form action="/return-order/<%= order.orderId %>/<%= item._id %>" method="POST">
+
+
+              
                   <input type="text" name="reason" placeholder="Reason for return" required />
                   <button type="submit">Return</button>
                 </form>

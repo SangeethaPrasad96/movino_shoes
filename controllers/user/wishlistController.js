@@ -14,6 +14,12 @@ const viewWishlist = async (req, res) => {
 };
 
 const addToWishlist = async (req, res) => {
+  console.log("Session data:", req.session);
+
+
+  if (!req.session.user || !req.session.user._id) {
+    return res.status(401).json({ success: false, message: 'User not logged in' });
+  }
   const userId = req.session.user._id;
   const productId = req.params.id;
 
@@ -47,4 +53,3 @@ module.exports = {
   addToWishlist,
   removeFromWishlist
 };
-
