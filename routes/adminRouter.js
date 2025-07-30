@@ -68,7 +68,7 @@ router.post("/categories/add", adminAuth, uploadCategory.single("image"), catego
 
 // Edit category
 router.get("/categories/edit/:id", adminAuth,categoryController.editCategoryPage);
-// router.post("/categories/edit/:id", adminAuth,upload.single("image"), categoryController.editCategory);
+
 router.post("/categories/edit/:id", adminAuth, uploadCategory.single("image"), categoryController.editCategory);
 
 // Soft delete
@@ -123,7 +123,7 @@ router.post('/categories/unblock/:id', categoryController.unblockCategory);
 router.get('/products/add', adminAuth, productController.getAddProductForm);
 
 // Handle product creation
-// router.post('/products/add', adminAuth, upload.array('images', 5), resizeProductImages, productController.postAddProduct);
+
 router.post('/products/add', adminAuth, uploadProduct.array('images', 5), resizeProductImages, productController.postAddProduct);
 
 // List active products
@@ -136,7 +136,7 @@ router.get('/products/delete/:id', adminAuth, productController.softDeleteProduc
 router.get('/products/edit/:id', adminAuth, productController.editProductForm);
 
 // Handle edit post
-// router.post('/products/edit/:id', adminAuth, upload.array('images', 5), resizeProductImages, productController.updateProduct);
+
 router.post('/products/edit/:id', adminAuth, uploadProduct.array('images', 5), resizeProductImages, productController.updateProduct);
 
 // View deleted products
@@ -147,8 +147,7 @@ router.post('/products/recover/:id', adminAuth, productController.recoverProduct
 
 
 
-router.post('/products/block/:id', productController.blockProducts);
-router.post('/products/unblock/:id', productController.unblockProducts);
+
 
 
 

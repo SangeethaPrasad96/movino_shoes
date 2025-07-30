@@ -175,7 +175,7 @@ const orderSchema = new Schema({
        type: String,
        required: true,
       //  enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned','Return Approved', 'Return Rejected']
-      enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned', 'Refunded']
+      enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned', 'Refunded','Return Rejected']
      },
      createdOn: {
        type: Date,

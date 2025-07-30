@@ -1,146 +1,150 @@
 <%- include("../../views/partials/admin/header") %>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <h3 class="text-center mb-4">Add Product</h3>
+      <form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <div class="row g-4">
 
+          <!-- Left Column -->
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="name" class="form-label">Product Name</label>
+              <input type="text" name="name" id="name" class="form-control" required>
+              <div class="invalid-feedback">Product name is required.</div>
+            </div>
 
-<div style="min-height: 80vh;" class="d-flex justify-content-center align-items-center">
-  <div class="container" style="max-width: 600px;">
-    <h3 class="text-center mb-4">Add Product</h3>
-    <form action="/admin/products/add" method="POST" enctype="multipart/form-data">
-      <div class="mb-3">
-        <label>Product Name</label>
-        <input type="text" name="name" class="form-control" required>
-      </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea name="description" id="description" class="form-control" rows="3" required></textarea>
+              <div class="invalid-feedback">Description is required.</div>
+            </div>
 
-<!-- Description Field -->
-<div class="form-group">
-  <label for="description">Description</label>
-  <textarea name="description" id="description" class="form-control" rows="3" required></textarea>
-</div>
+            <div class="mb-3">
+              <label for="stock" class="form-label">Stock</label>
+              <input type="number" name="stock" id="stock" class="form-control" min="0" required>
+              <div class="invalid-feedback">Stock must be a non-negative number.</div>
+            </div>
 
-<!-- Stock Field -->
-<div class="form-group">
-  <label for="stock">Stock</label>
-  <input type="number" name="stock" id="stock" class="form-control" min="0" required />
-</div>
+            <div class="mb-3">
+              <label for="price" class="form-label">Price</label>
+              <input type="number" name="price" id="price" class="form-control" required>
+              <div class="invalid-feedback">Price is required.</div>
+            </div>
+          </div>
 
+          <!-- Right Column -->
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="category" class="form-label">Category</label>
+              <select name="category" id="category" class="form-select" required>
+                <option value="">-- Select Category --</option>
+                <% 
+                  const seen = new Set();
+                  categories.forEach(category => { 
+                    if (!seen.has(category.categoryName)) {
+                      seen.add(category.categoryName);
+                %>
+                  <option value="<%= category._id %>"><%= category.categoryName %></option>
+                <% 
+                    }
+                  }); 
+                %>
+              </select>
+              <div class="invalid-feedback">Please select a category.</div>
+            </div>
 
+            <div class="mb-3">
+              <label for="subcategory" class="form-label">Subcategory</label>
+              <select name="subcategory" id="subcategory" class="form-select" required>
+                <option value="">-- Select Subcategory --</option>
+                <option value="Formal">Formal</option>
+                <option value="Casual">Casual</option>
+                <option value="Sports">Sports</option>
+              </select>
+              <div class="invalid-feedback">Please select a subcategory.</div>
+            </div>
 
-      <div class="mb-3">
-        <label>Category</label>
-        <select name="category" class="form-select" required>
-          <option value="">-- Select Category --</option>
-          <% categories.forEach(category => { %>
-      <option value="<%= category._id %>"><%= category.categoryName %></option>
-    <% }); %>
-          <!-- <option value="Men">Men</option>
-          <option value="Women">Women</option> -->
-        </select>
-      </div>
+            <div class="mb-3">
+              <label for="images" class="form-label">Images (Min 3)</label>
+              <input type="file" name="images" id="images" class="form-control" multiple accept="image/*" required>
+              <div class="invalid-feedback">Please upload at least 3 images.</div>
+            </div>
 
-      <div class="mb-3">
-        <label>Subcategory</label>
-        <select name="subcategory" class="form-select" required>
-          <option value="">-- Select Subcategory --</option>
-          <option value="Formal">Formal</option>
-          <option value="Casual">Casual</option>
-          <option value="Sports">Sports</option>
-        </select>
-      </div>
-
-      <!-- <div class="mb-3">
-        <label>Price</label>
-        <input type="number" name="price" class="form-control" required>
-      </div> -->
-      <div class="mb-3">
-        <label>Price</label>
-        <div class="input-group">
-          <!-- <span class="input-group-text">₹</span> -->
-          <input type="number" name="price" class="form-control"  required>
+            <div id="imagePreview" class="d-flex flex-wrap gap-2 mt-2"></div>
+          </div>
         </div>
-      </div>
-      
-      <div class="mb-3">
-        <label>Images (Min 3)</label>
-        <!-- <input type="file" name="images[]" class="form-control" multiple accept="image/*" required> -->
-        <input type="file" name="images" class="form-control" multiple accept="image/*" required>
 
-      </div>
-      <!-- <div id="imagePreview" class="d-flex flex-wrap"></div> -->
-      <div id="imagePreview" class="d-flex flex-wrap mt-2"></div>
+    <!-- Action Buttons -->
+<div class="d-flex justify-content-between mt-4">
+  <button type="submit" class="btn btn-success px-4">Add Product</button>
+  <a href="/admin/products" class="btn btn-secondary px-4">Cancel</a>
+</div>
 
-      <button type="submit" class="btn btn-success w-100">Add Product</button>
-    </form>
+      </form>
+    </div>
   </div>
 </div>
 
-
-
+<!-- Cropper Modal -->
+<div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <img id="cropImage" style="max-width: 100%; max-height: 500px;" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button id="cropButton" type="button" class="btn btn-primary">Crop & Add</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-  const imageInput = document.querySelector('input[name="images"]');
+  const imageInput = document.getElementById('images');
   const imagePreview = document.getElementById('imagePreview');
   const form = document.querySelector('form');
 
-  imageInput.addEventListener('change', function () {
-    imagePreview.innerHTML = ''; // Clear preview
-
-    const files = Array.from(this.files);
-
-    files.forEach(file => {
+  imageInput.addEventListener('change', () => {
+    imagePreview.innerHTML = '';
+    Array.from(imageInput.files).forEach(file => {
       const reader = new FileReader();
-      reader.onload = function (e) {
+      reader.onload = e => {
         const img = document.createElement('img');
         img.src = e.target.result;
-        img.classList.add('me-2', 'mb-2');
-        img.style.height = '60px';
-        img.style.width = '60px';
-        img.style.objectFit = 'cover';
-        img.style.border = '1px solid #ccc';
-        img.style.borderRadius = '5px';
+        img.style.cssText = "height: 60px; width: 60px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc;";
         imagePreview.appendChild(img);
       };
       reader.readAsDataURL(file);
     });
   });
 
-  // form.addEventListener('submit', function (e) {
-  //   const files = imageInput.files;
-  //   if (files.length < 3) {
-  //     e.preventDefault();
-  //     alert('Please upload at least 3 images.');
-  //   }
-  // });
-
   form.addEventListener('submit', function (e) {
-    const files = imageInput.files;
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
 
-    if (files.length < 3) {
+    if (imageInput.files.length < 3) {
       e.preventDefault();
       Swal.fire({
         icon: 'error',
         title: 'Minimum 3 Images Required',
         text: 'Please upload at least 3 product images.'
       });
-      return;
-    }
-
-    const name = form.querySelector('input[name="name"]').value.trim();
-    const description = form.querySelector('textarea[name="description"]').value.trim();
-    const price = form.querySelector('input[name="price"]').value.trim();
-    const stock = form.querySelector('input[name="stock"]').value.trim();
-
-    if (!name || !description || !price || !stock) {
-      e.preventDefault();
-      Swal.fire({
-        icon: 'warning',
-        title: 'Validation Error',
-        text: 'Please fill all required fields.'
-      });
-      return;
     }
   });
 
+
+
+  
   const params = new URLSearchParams(window.location.search);
   if (params.get('exists') === 'true') {
     Swal.fire({
@@ -149,11 +153,6 @@
       text: 'Please try with another name.',
     });
   }
-
-  
 </script>
 
-
 <%- include("../../views/partials/admin/footer") %>
-
-

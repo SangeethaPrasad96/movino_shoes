@@ -25,16 +25,15 @@ const getAllProducts = async (req, res) => {
     const totalProducts = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalProducts / limit);
 
-    // const products = await Product.find(query)
-    // .sort({ createdAt: -1 })
-    //   .skip((page - 1) * limit)
-    //   .limit(limit);
+  
 
       const products = await Product.find(query)
-      .populate('category') // <--- this is the key change!
+      .populate('category') 
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
+
+
 
     res.render('products/productList', {
       products,
@@ -51,16 +50,13 @@ const getAllProducts = async (req, res) => {
 };
 
 // 2. GET add product form
-// const getAddProductForm = (req, res) => {
-//   res.render('products/addProduct');
-// };
 
 
 const getAddProductForm = async (req, res) => {
   try {
     const categories = await Category.find({ isBlocked: false }); // Fetch categories from DB
     res.render('products/addProduct', {
-      categories, // ✅ Pass to EJS
+      categories, 
       error: req.query.error,
       exists: req.query.exists
     });
@@ -86,12 +82,12 @@ const postAddProduct = async (req, res) => {
     }
     // Check if at least 3 images are uploaded
     if (!req.files || req.files.length < 3) {
-      // You can pass a query parameter to trigger SweetAlert on frontend
+    
       return res.redirect('/admin/products/add?error=minimumImages');
     }
 
-    // const images = req.files.map(file => file.filename);
     const images = req.body.images;
+ 
 
     const newProduct = new Product({
       name,
@@ -136,47 +132,113 @@ const editProductForm = async (req, res) => {
 
 
 
+// const updateProduct = async (req, res) => {
+//   try {
+
+//     console.log(req.files)
+//     const productId = req.params.id;
+ 
+//     const { name, category: categoryId, subcategory, price, description, stock } = req.body;
+ 
+//     // Convert category name to ObjectId
+//     const categoryDoc = await Category.findOne({ categoryName: categoryId });
+//     if (!categoryDoc) {
+//       return res.status(400).send("Invalid category selected");
+//     }
+
+
+//     const existingProduct = await Product.findById(productId);
+//     if (!existingProduct) {
+//       console.log('No product found with ID:', productId);
+//       return res.status(404).send("Product not found");
+//     }
+
+
+
+//     const nameExists = await Product.findOne({ name: name.trim(), _id: { $ne: productId } });
+//     if (nameExists) {
+//       return res.redirect(`/admin/products/edit/${productId}?exists=true`);
+//     }
+
+
+//     const updatedFields = {
+//       name: name || existingProduct.name,
+//       category: categoryDoc._id || existingProduct.category,
+//       subcategory: subcategory || existingProduct.subcategory,
+//       price: price || existingProduct.price,
+//       description: description || existingProduct.description,
+//       stock: stock || existingProduct.stock,
+//     };
+    
+
+  
+
+//     if (req.files && req.files.length > 0) {
+//       if (req.files.length < 3) {
+//         return res.redirect(`/admin/products/edit/${productId}?error=minImages`);
+//       }
+
+//       if (existingProduct.images && existingProduct.images.length > 0) {
+//         existingProduct.images.forEach(img => {
+//           const imgPath = path.join(__dirname, "../../uploads/products", img);
+//           if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+//         });
+//       }
+
+
+      
+//       const newImages = req.files.map(file => file.filename); // ✅ FIXED
+//       updatedFields.images = newImages;
+    
+
+     
+
+//     }else{
+//       updatedFields.images = existingProduct.images;
+//     }
+
+//     await Product.findByIdAndUpdate(productId, updatedFields, { new: true });
+
+//     res.redirect('/admin/products?updated=success');
+//   } catch (error) {
+//     console.error('Error updating product:', error);
+//     res.status(500).send('Internal Server Error');
+//   }
+
+
+
+// };
+
+
+
+
 const updateProduct = async (req, res) => {
   try {
+
+
     const productId = req.params.id;
-    // const { name, category, subcategory, price, description, stock } = req.body;
-
-    // const existingProduct = await Product.findById(productId);
-    // if (!existingProduct) {
-    //   console.log('No product found with ID:', productId);
-    //   return res.status(404).send("Product not found");
-    // }
-
-    // const nameExists = await Product.findOne({ name: name.trim(), _id: { $ne: productId } });
-    // if (nameExists) {
-    //   return res.redirect(`/admin/products/edit/${productId}?exists=true`);
-    // }
-
-    // const updatedFields = {
-    //   name: name || existingProduct.name,
-    //   category: category || existingProduct.category,
-    //   subcategory: subcategory || existingProduct.subcategory,
-    //   price: price || existingProduct.price,
-    //   description: description || existingProduct.description,
-    //   stock: stock || existingProduct.stock,
-    // };
     const { name, category: categoryId, subcategory, price, description, stock } = req.body;
 
     // Convert category name to ObjectId
     const categoryDoc = await Category.findOne({ categoryName: categoryId });
     if (!categoryDoc) {
-      return res.status(400).send("Invalid category selected");
+      return res.status(400).send('Invalid category selected');
     }
+
+    // Check if product exists
     const existingProduct = await Product.findById(productId);
     if (!existingProduct) {
       console.log('No product found with ID:', productId);
-      return res.status(404).send("Product not found");
+      return res.status(404).send('Product not found');
     }
 
+    // Check for duplicate product name
     const nameExists = await Product.findOne({ name: name.trim(), _id: { $ne: productId } });
     if (nameExists) {
       return res.redirect(`/admin/products/edit/${productId}?exists=true`);
     }
+
+    // Prepare updated fields
     const updatedFields = {
       name: name || existingProduct.name,
       category: categoryDoc._id || existingProduct.category,
@@ -185,23 +247,30 @@ const updateProduct = async (req, res) => {
       description: description || existingProduct.description,
       stock: stock || existingProduct.stock,
     };
-    
-    if (req.files && req.files.length > 0) {
-      if (req.files.length < 3) {
+
+    // Handle image updates
+    if (req.body.images && req.body.images.length > 0) {
+      if (req.body.images.length < 3) {
         return res.redirect(`/admin/products/edit/${productId}?error=minImages`);
       }
 
+      // Delete old images
       if (existingProduct.images && existingProduct.images.length > 0) {
         existingProduct.images.forEach(img => {
-          const imgPath = path.join(__dirname, "../../public/uploads", img);
-          if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+          const imgPath = path.join(__dirname, '../public/uploads/products', img);
+          if (fs.existsSync(imgPath)) {
+            fs.unlinkSync(imgPath);
+          }
         });
       }
 
-      const newImages = req.files.map(file => file.filename); // ✅ FIXED
-      updatedFields.images = newImages;
+      // Use resized image names from req.body.images
+      updatedFields.images = req.body.images;
+    } else {
+      updatedFields.images = existingProduct.images;
     }
 
+    // Update product in database
     await Product.findByIdAndUpdate(productId, updatedFields, { new: true });
 
     res.redirect('/admin/products?updated=success');
@@ -279,31 +348,7 @@ const searchProducts = async (req, res) => {
 
 
 
-// Block products
-const blockProducts = async (req, res) => {
-  try {
-    const productId = req.params.id;
- 
-    await Product.findByIdAndUpdate(productId, { isBlocked: true });
-    res.redirect('/admin/products');
-  } catch (err) {
-    console.error('Error blocking product:', err);
-    res.status(500).send('Internal Server Error');
-  }
-};
 
-// Unblock products
-const unblockProducts = async (req, res) => {
-  try {
-    const productId = req.params.id;
-   
-    await Product.findByIdAndUpdate(productId, { isBlocked: false });
-    res.redirect('/admin/products');
-  } catch (err) {
-    console.error('Error unblocking product:', err);
-    res.status(500).send('Internal Server Error');
-  }
-};
 
 
    
@@ -319,8 +364,7 @@ module.exports = {
   viewDeletedProducts,
   recoverProduct,
   searchProducts,
-  blockProducts,
-  unblockProducts
+
   
 };
 

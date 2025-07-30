@@ -58,21 +58,17 @@
 
       <!-- Current Images -->
       <div class="mb-3">
-        <!-- <label>Current Images:</label><br>
-        <% if (product.images && product.images.length > 0) { %>
-          <div class="d-flex flex-wrap">
-            <% product.images.forEach(img => { %>
-              <img src="/uploads/<%= img %>" width="80" height="60" class="m-1 rounded shadow-sm" style="object-fit: cover;">
-            <% }) %>
-          </div>
-        <% } else { %>
-          <p>No images available.</p>
-        <% } %> -->
+     
 
         <label>Current Images:</label><br>
 <% if (product.images && product.images.length > 0) { %>
+
+
   <% product.images.forEach(function(image) { %>
-    <img src="/uploads/<%= image %>" alt="Product Image" width="100" height="100" style="margin-right: 10px;" />
+    <img src="/uploads/products/<%= image %>" alt="Product Image" width="100" height="100" style="margin-right: 10px;" />
+
+
+    
   <% }); %>
 <% } else { %>
   <p>No images available</p>
@@ -84,6 +80,9 @@
       <div class="mb-3">
         <label>Upload New Images (Min 3 to replace all)</label>
         <input type="file" name="images" id="imagesInput" multiple class="form-control" accept="image/*">
+      
+
+     
       </div>
 
       <!-- Preview New Images -->
@@ -99,44 +98,7 @@
   </div>
 </div>
 
-<!-- <script>
-  const imageInput = document.getElementById('imagesInput');
-  const previewDiv = document.getElementById('newImagePreview');
-  const form = document.getElementById('editProductForm');
 
-  imageInput.addEventListener('change', () => {
-    previewDiv.innerHTML = '';
-    const files = Array.from(imageInput.files);
-
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.classList.add('me-2', 'mb-2');
-        img.style.height = '60px';
-        img.style.width = '60px';
-        img.style.objectFit = 'cover';
-        img.style.border = '1px solid #ccc';
-        img.style.borderRadius = '5px';
-        previewDiv.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-    });
-  });
-
-  form.addEventListener('submit', function(e) {
-    const files = imageInput.files;
-    if (files.length > 0 && files.length < 3) {
-      e.preventDefault();
-      Swal.fire({
-        icon: 'warning',
-        title: 'Minimum 3 Images Required',
-        text: 'Please upload at least 3 images to replace existing ones.',
-      });
-    }
-  });
-</script> -->
 
 <script>
   const imageInput = document.getElementById('imagesInput');

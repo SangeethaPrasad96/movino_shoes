@@ -9,6 +9,8 @@ const createStorage = (folderName) => {
     fs.mkdirSync(folderPath, { recursive: true });
   }
 
+
+
   return multer.diskStorage({
     destination: (req, file, cb) => cb(null, folderPath),
     filename: (req, file, cb) => {
@@ -17,6 +19,10 @@ const createStorage = (folderName) => {
       cb(null, filename);
     },
   });
+
+
+
+
 };
 
 // File type filter
