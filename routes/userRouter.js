@@ -138,6 +138,8 @@ router.get('/checkout', userAuth, userController.checkoutPage);
 // Save address (both add and edit)
 router.post('/save-address', userAuth,userController.saveAddress);
 router.post('/edit-address', userController.editAddressCheckout);
+router.post('/delete-address/:id', userAuth, userController.deleteAddressCheckout);
+
 
 //order complete
 

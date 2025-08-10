@@ -187,34 +187,23 @@ const updateProduct = async (req, res) => {
       stock: stock || existingProduct.stock,
     };
 
-    // Handle image updates
-    // if (req.body.images && req.body.images.length > 0) {
-    //   if (req.body.images.length < 3) {
-    //     return res.redirect(`/admin/products/edit/${productId}?error=minImages`);
-    //   }
-
-    //   // Delete old images
-    //   if (existingProduct.images && existingProduct.images.length > 0) {
-    //     existingProduct.images.forEach(img => {
-    //       const imgPath = path.join(__dirname, '../public/uploads/products', img);
-    //       if (fs.existsSync(imgPath)) {
-    //         fs.unlinkSync(imgPath);
-    //       }
-    //     });
-    //   }
-
-    //   // Use resized image names from req.body.images
-    //   updatedFields.images = req.body.images;
-    // } else {
-    //   updatedFields.images = existingProduct.images;
-    // }
+    
 
 
-    // Assuming you're using multer or similar and new images are in req.files
-if (req.files && req.files.length > 0) {
+
+
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      console.log("New images uploaded:", req.files.length);
+
+
   if (req.files.length < 3) {
+    // Stop and show error only if they tried to replace with less than 3 new images
     return res.redirect(`/admin/products/edit/${productId}?error=minImages`);
   }
+// if (req.files && req.files.length > 0) {
+//   if (req.files.length < 3) {
+//     return res.redirect(`/admin/products/edit/${productId}?error=minImages`);
+//   }
 
   // Delete old images
   if (existingProduct.images && existingProduct.images.length > 0) {

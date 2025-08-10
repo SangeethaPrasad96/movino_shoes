@@ -7,6 +7,8 @@
 
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 	
 	<!-- Animate.css -->
 	<link rel="stylesheet" href="css/animate.css">
@@ -35,7 +37,10 @@
 	<!-- Theme style  -->
 	<link rel="stylesheet" href="css/style.css">
 
+
+	
 	</head>
+
 	<body>
 		
 	<div class="colorlib-loader"></div>
@@ -154,101 +159,14 @@
 						</div>
 					</div>
 				</div>
+
+
+
+
 				<div class="row">
 					<div class="col-lg-8">
 						<form method="post" class="colorlib-form">
-							<!-- <h2>Billing Details</h2>
-		              	<div class="row">
-			               <div class="col-md-12">
-			                  <div class="form-group">
-			                  	<label for="country">Select Country</label>
-			                     <div class="form-field">
-			                     	<i class="icon icon-arrow-down3"></i>
-			                        <select name="people" id="people" class="form-control">
-				                      	<option value="#">Select country</option>
-				                        <option value="#">Alaska</option>
-				                        <option value="#">China</option>
-				                        <option value="#">Japan</option>
-				                        <option value="#">Korea</option>
-				                        <option value="#">Philippines</option>
-			                        </select> -->
-			                     <!-- </div>
-			                  </div>
-			               </div>
-
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="fname">First Name</label>
-										<input type="text" id="fname" class="form-control" placeholder="Your firstname">
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="lname">Last Name</label>
-										<input type="text" id="lname" class="form-control" placeholder="Your lastname">
-									</div>
-								</div> -->
-
-								<!-- <div class="col-md-12">
-									<div class="form-group">
-										<label for="companyname">Company Name</label>
-			                    	<input type="text" id="companyname" class="form-control" placeholder="Company Name">
-			                  </div>
-			               </div>
-
-			               <div class="col-md-12">
-									<div class="form-group">
-										<label for="fname">Address</label>
-			                    	<input type="text" id="address" class="form-control" placeholder="Enter Your Address">
-			                  </div>
-			                  <div class="form-group">
-			                    	<input type="text" id="address2" class="form-control" placeholder="Second Address">
-			                  </div>
-			               </div>
-			             -->
-			               <!-- <div class="col-md-12">
-									<div class="form-group">
-										<label for="companyname">Town/City</label>
-			                    	<input type="text" id="towncity" class="form-control" placeholder="Town or City">
-			                  </div>
-			               </div>
-			            
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="stateprovince">State/Province</label>
-										<input type="text" id="fname" class="form-control" placeholder="State Province">
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="lname">Zip/Postal Code</label>
-										<input type="text" id="zippostalcode" class="form-control" placeholder="Zip / Postal">
-									</div>
-								</div> -->
 							
-								<!-- <div class="col-md-6">
-									<div class="form-group">
-										<label for="email">E-mail Address</label>
-										<input type="text" id="email" class="form-control" placeholder="State Province">
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="Phone">Phone Number</label>
-										<input type="text" id="zippostalcode" class="form-control" placeholder="">
-									</div>
-								</div>
-
-								<div class="col-md-12">
-									<div class="form-group">
-										<div class="radio">
-										  <label><input type="radio" name="optradio"> Create an Account? </label>
-										  <label><input type="radio" name="optradio"> Ship to different address</label>
-										</div>
-									</div>
-								</div> -->
-		               <!-- </div> -->
-
 
 					 
 					 
@@ -256,99 +174,90 @@
 					 
 					   <h2>Select Delivery Address</h2>
 
-  <% 
-const defaultAddress = otherAddresses.find(addr => addr.isDefault); 
-const otherNonDefault = otherAddresses.filter(addr => !addr.isDefault); 
-%>
+					   <% 
+					   const defaultAddress = otherAddresses.find(addr => addr.isDefault); 
+					   const otherNonDefault = otherAddresses.filter(addr => !addr.isDefault); 
+					   %>
+					   
+					   <!-- ✅ DEFAULT ADDRESS -->
+					   <% if (defaultAddress) { %>
+						 <div class="address-section">
+						   <h4>DEFAULT ADDRESS</h4>
+						   <div class="address-box default" id="addressBox-default">
+							 <label>
+							   <input 
+								 type="radio" 
+								 name="selectedAddress" 
+								 value="<%= defaultAddress._id %>" 
+								 onchange="handleAddressSelect('default')" 
+								 checked
+							   >
+							   <strong><%= defaultAddress.fullName %></strong> 
+							   <span class="tag">DEFAULT</span>
+							 </label>
+							 <p><%= defaultAddress.addressLine %>, <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%= defaultAddress.pincode %></p>
+							 <p>Mobile: <%= defaultAddress.phone %></p>
+							 <div class="address-actions" id="actions-default">
+							   <button 
+								 type="button" 
+								 class="btn btn-sm btn-outline-secondary"
+								 data-address='<%- JSON.stringify(defaultAddress) %>'
+								 onclick="handleEditClick(this)"
+							   >
+								 Edit
+							   </button>
+					   
+							   <form action="/delete-address/<%= defaultAddress._id %>" method="POST" style="display:inline;">
+								 <button type="submit" class="btn btn-sm btn-outline-danger"  onclick="confirmDelete('<%= defaultAddress._id %>')">
+								   Remove
+								 </button>
+							   </form>
+							 </div>
+						   </div>
+						 <!-- </div> -->
+					   <% } %>
+					   
+					   <!-- OTHER ADDRESSES -->
+					   <% if (otherNonDefault.length > 0) { %>
+						 <div class="address-section">
+						   <h4>OTHER ADDRESSES</h4>
+						   <% otherNonDefault.forEach((address, index) => { %>
+							 <div class="address-box" id="addressBox-<%= index %>">
+							   <label>
+								 <input 
+								   type="radio" 
+								   name="selectedAddress" 
+								   value="<%= address._id %>" 
+								   onchange="handleAddressSelect('<%= index %>')"
+								 >
+								 <strong><%= address.fullName %></strong> 
+							   </label>
+							   <p><%= address.addressLine %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
+							   <p>Mobile: <%= address.phone %></p>
+							   <div class="address-actions" id="actions-<%= index %>" style="display: none;">
+								 <button 
+								   type="button" 
+								   class="btn btn-sm btn-outline-secondary"
+								   data-address='<%- JSON.stringify(address) %>'
+								   onclick="handleEditClick(this)"
+								 >
+								   Edit
+								 </button>
+					   
+								 <form action="/delete-address/<%= address._id %>" method="POST" style="display:inline;">
+								   <button type="submit" class="btn btn-sm btn-outline-danger" onclick="confirmDelete('<%= address._id %>')">
+									 Remove
+								   </button>
+								 </form>
+							   </div>
+							 </div>
+						   <% }); %>
+						 </div>
+					   <% } %>
+					   
+						</div>
 
-<!-- ✅ DEFAULT ADDRESS -->
-
-
-<% if (defaultAddress) { %>
-  <div class="address-section">
-    <h4>DEFAULT ADDRESS</h4>
-    <div class="address-box default" id="addressBox-default">
-      <label>
-        <input 
-          type="radio" 
-          name="selectedAddress" 
-          value="<%= defaultAddress._id %>" 
-          onchange="handleAddressSelect('default')" 
-          checked
-        >
-        <strong><%= defaultAddress.fullName %></strong> 
-        <span class="tag">DEFAULT</span>
-      </label>
-      <p><%= defaultAddress.addressLine %>, <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%= defaultAddress.pincode %></p>
-      <p>Mobile: <%= defaultAddress.phone %></p>
-      <div class="address-actions" id="actions-default">
-        <!-- <a href="/edit-address/<%= defaultAddress._id %>" class="btn btn-sm btn-outline-secondary">Edit</a> -->
-
-		<!-- <button 
-		type="button" 
-		class="btn btn-sm btn-outline-secondary"
-		onclick="openEditAddressModal('<%- JSON.stringify(defaultAddress) %>')"
-
-	  >
-		Edit
-	  </button>
-	   -->
-
-	   <button 
-  type="button" 
-  class="btn btn-sm btn-outline-secondary"
-  data-address='<%- JSON.stringify(defaultAddress) %>'
-  onclick="handleEditClick(this)"
->
-  Edit
-</button>
-
-		
-        <a href="/delete-address/<%= defaultAddress._id %>" class="btn btn-sm btn-outline-danger">Remove</a>
-      </div>
-    </div>
-  </div>
-<% } %>
-
-<!-- OTHER ADDRESSES -->
-
-<% if (otherNonDefault.length > 0) { %>
-  <div class="address-section">
-    <h4>OTHER ADDRESSES</h4>
-    <% otherNonDefault.forEach((address, index) => { %>
-      <div class="address-box" id="addressBox-<%= index %>">
-        <label>
-          <input 
-            type="radio" 
-            name="selectedAddress" 
-            value="<%= address._id %>" 
-            onchange="handleAddressSelect('<%= index %>')"
-          >
-          <strong><%= address.fullName %></strong> 
-        </label>
-        <p><%= address.addressLine %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
-        <p>Mobile: <%= address.phone %></p>
-        <div class="address-actions" id="actions-<%= index %>" style="display: none;">
-          <!-- <a href="/edit-address/<%= address._id %>" class="btn btn-sm btn-outline-secondary">Edit</a> -->
-
-		  <button 
-  type="button" 
-  class="btn btn-sm btn-outline-secondary"
-  data-address='<%- JSON.stringify(address) %>'
-  onclick="handleEditClick(this)"
->
-  Edit
-</button>
-
-          <a href="/delete-address/<%= address._id %>" class="btn btn-sm btn-outline-danger">Remove</a>
-        </div>
-      </div>
-    <% }); %>
-  </div>
-<% } %>
- </form>
-</div>
-
+					</div>
 
 <!-- ADDRESS MODAL -->
 <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
@@ -366,27 +275,27 @@ const otherNonDefault = otherAddresses.filter(addr => !addr.isDefault);
   
 			<div class="form-group">
 			  <label>Full Name</label>
-			  <input type="text" class="form-control" name="fullName" id="fullName" required>
+			  <input type="text" class="form-control" name="fullName" id="fullName" >
 			</div>
 			<div class="form-group">
 			  <label>Address Line</label>
-			  <input type="text" class="form-control" name="addressLine" id="addressLine" required>
+			  <input type="text" class="form-control" name="addressLine" id="addressLine" >
 			</div>
 			<div class="form-group">
 			  <label>City</label>
-			  <input type="text" class="form-control" name="city" id="city" required>
+			  <input type="text" class="form-control" name="city" id="city" >
 			</div>
 			<div class="form-group">
 			  <label>State</label>
-			  <input type="text" class="form-control" name="state" id="state" required>
+			  <input type="text" class="form-control" name="state" id="state" >
 			</div>
 			<div class="form-group">
 			  <label>Pincode</label>
-			  <input type="text" class="form-control" name="pincode" id="pincode" required>
+			  <input type="text" class="form-control" name="pincode" id="pincode" >
 			</div>
 			<div class="form-group">
 			  <label>Phone</label>
-			  <input type="text" class="form-control" name="phone" id="phone" required>
+			  <input type="text" class="form-control" name="phone" id="phone" >
 			</div>
   
 		  </div>
@@ -547,104 +456,200 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	
 
 
-
+  <script>
+	function handleAddressSelect(selectedId) {
+		document.querySelectorAll('.address-actions').forEach(div => {
+			div.style.display = 'none';
+		});
+		const selectedDiv = document.getElementById(`actions-${selectedId}`);
+		if (selectedDiv) {
+			selectedDiv.style.display = 'block';
+		}
+	}
 	
-	  
+	window.addEventListener('DOMContentLoaded', () => {
+		const radios = document.querySelectorAll('input[name="selectedAddress"]');
+	
+		radios.forEach(radio => {
+			if (radio.checked) {
+				const match = radio.getAttribute('onchange').match(/handleAddressSelect\('(.+?)'\)/);
+				if (match) {
+					handleAddressSelect(match[1]);
+				}
+			}
+			radio.addEventListener('change', () => {
+				const match = radio.getAttribute('onchange').match(/handleAddressSelect\('(.+?)'\)/);
+				if (match) {
+					handleAddressSelect(match[1]);
+				}
+			});
+		});
+	
+		// Set initial addressId on page load
+		const selected = document.querySelector('input[name="selectedAddress"]:checked');
+		if (selected) {
+			document.getElementById('hiddenAddressId').value = selected.value;
+		}
+	});
+	
+	function openAddAddressModal() {
+		document.getElementById('addressModalLabel').textContent = 'Add Address';
+		document.getElementById('addressForm').reset();
+		document.getElementById('addressId').value = '';
+		clearErrors();
+		$('#addressModal').modal('show');
+	}
+	
+	function handleEditClick(button) {
+		try {
+			const address = JSON.parse(button.getAttribute('data-address'));
+			openEditAddressModal(address);
+		} catch (e) {
+			console.error("Invalid address data", e);
+		}
+	}
+	
+	function openEditAddressModal(address) {
+		document.getElementById('addressModalLabel').textContent = 'Edit Address';
+		document.getElementById('addressId').value = address._id;
+		document.getElementById('fullName').value = address.fullName;
+		document.getElementById('addressLine').value = address.addressLine;
+		document.getElementById('city').value = address.city;
+		document.getElementById('state').value = address.state;
+		document.getElementById('pincode').value = address.pincode;
+		document.getElementById('phone').value = address.phone;
+		clearErrors();
+		$('#addressModal').modal('show');
+	}
+	
+	document.querySelectorAll('input[name="selectedAddress"]').forEach(radio => {
+		radio.addEventListener('change', () => {
+			document.getElementById('hiddenAddressId').value = radio.value;
+		});
+	});
+	
+	/* -------------------------------
+	   Inline Address Form Validation
+	--------------------------------*/
+	function showError(inputId, message) {
+		const input = document.getElementById(inputId);
+		let errorEl = input.nextElementSibling;
+		if (!errorEl || !errorEl.classList.contains('error-message')) {
+			errorEl = document.createElement('div');
+			errorEl.classList.add('error-message');
+			errorEl.style.color = 'red';
+			errorEl.style.fontSize = '0.9em';
+			input.insertAdjacentElement('afterend', errorEl);
+		}
+		errorEl.textContent = message;
+	}
+	
+	function clearErrors() {
+		document.querySelectorAll('.error-message').forEach(el => el.remove());
+	}
+	
+	document.getElementById('addressForm').addEventListener('submit', function (e) {
+		clearErrors();
+		let isValid = true;
+	
+		const fullName = document.getElementById('fullName').value.trim();
+		const addressLine = document.getElementById('addressLine').value.trim();
+		const city = document.getElementById('city').value.trim();
+		const state = document.getElementById('state').value.trim();
+		const pincode = document.getElementById('pincode').value.trim();
+		const phone = document.getElementById('phone').value.trim();
+	
+		if (fullName.length < 3) {
+			isValid = false;
+			showError('fullName', "Full name must be at least 3 characters.");
+		}
+		if (addressLine.length < 5) {
+			isValid = false;
+			showError('addressLine', "Address line must be at least 5 characters.");
+		}
+		if (!/^[A-Za-z\s]+$/.test(city)) {
+			isValid = false;
+			showError('city', "City should contain only letters.");
+		}
+		if (!/^[A-Za-z\s]+$/.test(state)) {
+			isValid = false;
+			showError('state', "State should contain only letters.");
+		}
+		if (!/^\d{6}$/.test(pincode)) {
+			isValid = false;
+			showError('pincode', "Pincode must be exactly 6 digits.");
+		}
+		if (!/^[6-9]\d{9}$/.test(phone)) {
+			isValid = false;
+			showError('phone', "Phone must be a valid 10-digit number starting with 6-9.");
+		}
+	
+		if (!isValid) {
+			e.preventDefault();
+		}
+	});
+	</script>
+	
 
-<script>
-  function handleAddressSelect(selectedId) {
-    // Hide all address action buttons
-    document.querySelectorAll('.address-actions').forEach(div => {
-      div.style.display = 'none';
-    });
 
-    // Show only the selected one
-    const selectedDiv = document.getElementById(`actions-${selectedId}`);
-    if (selectedDiv) {
-      selectedDiv.style.display = 'block';
-    }
-  }
-
-  // On page load, show the buttons for the pre-selected address
-  window.addEventListener('DOMContentLoaded', () => {
-    const radios = document.querySelectorAll('input[name="selectedAddress"]');
-
-    radios.forEach(radio => {
-      if (radio.checked) {
-        const match = radio.getAttribute('onchange').match(/handleAddressSelect\('(.+?)'\)/);
-        if (match) {
-          handleAddressSelect(match[1]);
-        }
-      }
-
-      // Also allow dynamic selection
-      radio.addEventListener('change', () => {
-        const match = radio.getAttribute('onchange').match(/handleAddressSelect\('(.+?)'\)/);
-        if (match) {
-          handleAddressSelect(match[1]);
-        }
-      });
-    });
-  });
-
-// Handle "Add New Address"
-function openAddAddressModal() {
-    document.getElementById('addressModalLabel').textContent = 'Add Address';
-    document.getElementById('addressForm').reset();
-    document.getElementById('addressId').value = '';
-    $('#addressModal').modal('show');
-  }
+	<script>
+		function confirmDelete(addressId) {
+		  Swal.fire({
+			title: 'Are you sure?',
+			text: "You won't be able to revert this action!",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#d33',
+			cancelButtonColor: '#6c757d',
+			confirmButtonText: 'Yes, delete it'
+		  }).then((result) => {
+			if (result.isConfirmed) {
+			  document.getElementById('deleteForm-' + addressId).submit();
+			}
+		  });
+		}
 
 
-
-
-function handleEditClick(button) {
-  try {
-    const address = JSON.parse(button.getAttribute('data-address'));
-    openEditAddressModal(address);
-  } catch (e) {
-    console.error("Invalid address data", e);
-  }
-}
-function openEditAddressModal(address) {
-  document.getElementById('addressModalLabel').textContent = 'Edit Address';
-  document.getElementById('addressId').value = address._id;
-  document.getElementById('fullName').value = address.fullName;
-  document.getElementById('addressLine').value = address.addressLine;
-  document.getElementById('city').value = address.city;
-  document.getElementById('state').value = address.state;
-  document.getElementById('pincode').value = address.pincode;
-  document.getElementById('phone').value = address.phone;
-  $('#addressModal').modal('show');
-}
-
- // Automatically update hidden input when address is selected
- document.querySelectorAll('input[name="selectedAddress"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-      document.getElementById('hiddenAddressId').value = radio.value;
-    });
-  });
-
-  // Set initial addressId on page load
-  window.addEventListener('DOMContentLoaded', () => {
-    const selected = document.querySelector('input[name="selectedAddress"]:checked');
-    if (selected) {
-      document.getElementById('hiddenAddressId').value = selected.value;
-    }
-  });
-
-
-
-
-
-
-</script>
-
-
-
-
-
-
+		
+		// </script>
+		
+		// <script>
+		// 	const form = document.querySelector('form[action="/place-order"]');
+		  
+		// 	form.addEventListener('submit', async function(event) {
+		// 	  event.preventDefault(); // prevent normal form submit
+		  
+		// 	  const formData = new FormData(form);
+		  
+		// 	  try {
+		// 		const response = await fetch('/place-order', {
+		// 		  method: 'POST',
+		// 		  body: formData
+		// 		});
+		  
+		// 		const data = await response.json();
+		  
+		// 		if (!response.ok) {
+		// 		  // If error response, show SweetAlert with the error message
+		// 		  Swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Oops...',
+		// 			text: data.error || 'Something went wrong!',
+		// 		  });
+		// 		} else {
+		// 		  // On success, redirect to order complete page
+		// 		  window.location.href = `/order-complete/${data.orderId}`;
+		// 		}
+		// 	  } catch (err) {
+		// 		Swal.fire({
+		// 		  icon: 'error',
+		// 		  title: 'Network Error',
+		// 		  text: 'Unable to place order. Please try again.',
+		// 		});
+		// 	  }
+		// 	});
+		//   </script>
+		  
 
 
 	<!-- jQuery -->

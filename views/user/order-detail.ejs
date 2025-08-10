@@ -292,6 +292,7 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 
 	const urlParams = new URLSearchParams(window.location.search);
      const cancelled = urlParams.get('cancelled') === 'true';
+	 const returnSuccess = urlParams.get('returnSuccess') === 'true';
 	  if (cancelled) {
 		Swal.fire({
 		  icon: 'success',
@@ -307,6 +308,22 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 			window.history.replaceState(null, null, cleanUrl);
 		  }
 
+
+		  if (returnSuccess) {
+    Swal.fire({
+      icon: 'success',
+      title: 'Return Request Submitted',
+      text: 'Your return request was submitted successfully.',
+    });
+
+	 // Remove query param from URL so alert doesn't show on refresh
+	 if (window.history.replaceState) {
+      const cleanUrl = window.location.href.split('?')[0];
+      window.history.replaceState(null, null, cleanUrl);
+    }
+
+		  }
+
 	</script>
 
 <script>
@@ -317,6 +334,10 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	  }
 	});
   </script>
+
+
+
+
 
 
 

@@ -17,7 +17,8 @@ const placeOrder = async (req, res) => {
 
     const addressId = req.body.addressId;
     if (!addressId) {
-      return res.status(400).send("Address is required");
+      // return res.status(400).send("Address is required");
+      return res.status(400).json({ error: "Address is required" });
     }
 
     const cart = await Cart.findOne({ userId, status: "active" }).populate("items.productId");
@@ -196,7 +197,12 @@ const returnOrder = async (req, res) => {
     await order.save();
     
 
-    return res.status(200).send('Return request submitted successfully');
+    // return res.status(200).send('Return request submitted successfully');
+    // return res.redirect(`/order-details/${orderId}?returnSuccess=true`);
+    return res.redirect(`/order/${orderId}?returnSuccess=true`);
+
+
+    
   } catch (error) {
     console.error("❌ Error in returnOrder:", error);
     return res.status(500).send('Server error');

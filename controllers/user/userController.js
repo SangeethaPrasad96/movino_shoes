@@ -944,7 +944,24 @@ const editAddressCheckout = async (req, res) => {
   }
 };
 
+const deleteAddressCheckout = async (req, res) => {
+  try {
+    const userId = req.session.user?._id;
+    const addressId = req.params.id;
 
+    if (!userId) {
+      return res.redirect('/login');
+    }
+
+    // Delete only if it belongs to the logged-in user
+    await Address.deleteOne({ _id: addressId, userId });
+
+    res.redirect('/checkout');
+  } catch (err) {
+    console.error("Delete address error:", err);
+    res.status(500).send("Something went wrong while deleting address");
+  }
+};
 
   
 
@@ -1026,6 +1043,7 @@ module.exports = {
     checkoutPage,
     saveAddress,
     editAddressCheckout,
+    deleteAddressCheckout,
     uploadProfileImage,
     walletPage
    
