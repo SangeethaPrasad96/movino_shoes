@@ -112,18 +112,23 @@ const postAddProduct = async (req, res) => {
 
 // 4. GET edit product form
 
+
 const editProductForm = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).send('Product not found');
 
-      // 👉 Pass error and exists flags to EJS
-      res.render('products/editProduct', {
-        product,
-        error: req.query.error,
-        exists: req.query.exists
-      });
-    // res.render('products/editProduct', { product });
+    // Fetch all categories
+    const categories = await Category.find(); 
+
+    // Render the editProduct view with product, categories, error, and exists
+    res.render('products/editProduct', {
+      product,
+      categories,
+      error: req.query.error,
+      exists: req.query.exists
+    });
+
   } catch (error) {
     console.error('Error fetching product for edit:', error);
     res.status(500).send('Server Error');
@@ -132,82 +137,6 @@ const editProductForm = async (req, res) => {
 
 
 
-// const updateProduct = async (req, res) => {
-//   try {
-
-//     console.log(req.files)
-//     const productId = req.params.id;
- 
-//     const { name, category: categoryId, subcategory, price, description, stock } = req.body;
- 
-//     // Convert category name to ObjectId
-//     const categoryDoc = await Category.findOne({ categoryName: categoryId });
-//     if (!categoryDoc) {
-//       return res.status(400).send("Invalid category selected");
-//     }
-
-
-//     const existingProduct = await Product.findById(productId);
-//     if (!existingProduct) {
-//       console.log('No product found with ID:', productId);
-//       return res.status(404).send("Product not found");
-//     }
-
-
-
-//     const nameExists = await Product.findOne({ name: name.trim(), _id: { $ne: productId } });
-//     if (nameExists) {
-//       return res.redirect(`/admin/products/edit/${productId}?exists=true`);
-//     }
-
-
-//     const updatedFields = {
-//       name: name || existingProduct.name,
-//       category: categoryDoc._id || existingProduct.category,
-//       subcategory: subcategory || existingProduct.subcategory,
-//       price: price || existingProduct.price,
-//       description: description || existingProduct.description,
-//       stock: stock || existingProduct.stock,
-//     };
-    
-
-  
-
-//     if (req.files && req.files.length > 0) {
-//       if (req.files.length < 3) {
-//         return res.redirect(`/admin/products/edit/${productId}?error=minImages`);
-//       }
-
-//       if (existingProduct.images && existingProduct.images.length > 0) {
-//         existingProduct.images.forEach(img => {
-//           const imgPath = path.join(__dirname, "../../uploads/products", img);
-//           if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
-//         });
-//       }
-
-
-      
-//       const newImages = req.files.map(file => file.filename); // ✅ FIXED
-//       updatedFields.images = newImages;
-    
-
-     
-
-//     }else{
-//       updatedFields.images = existingProduct.images;
-//     }
-
-//     await Product.findByIdAndUpdate(productId, updatedFields, { new: true });
-
-//     res.redirect('/admin/products?updated=success');
-//   } catch (error) {
-//     console.error('Error updating product:', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-
-
-
-// };
 
 
 
@@ -219,11 +148,21 @@ const updateProduct = async (req, res) => {
     const productId = req.params.id;
     const { name, category: categoryId, subcategory, price, description, stock } = req.body;
 
+
+
+
+
+
     // Convert category name to ObjectId
-    const categoryDoc = await Category.findOne({ categoryName: categoryId });
+    // const categoryDoc = await Category.findOne({ categoryName: categoryId });
+
+    const categoryDoc = await Category.findById(categoryId);
+
     if (!categoryDoc) {
       return res.status(400).send('Invalid category selected');
     }
+
+
 
     // Check if product exists
     const existingProduct = await Product.findById(productId);
@@ -249,26 +188,52 @@ const updateProduct = async (req, res) => {
     };
 
     // Handle image updates
-    if (req.body.images && req.body.images.length > 0) {
-      if (req.body.images.length < 3) {
-        return res.redirect(`/admin/products/edit/${productId}?error=minImages`);
-      }
+    // if (req.body.images && req.body.images.length > 0) {
+    //   if (req.body.images.length < 3) {
+    //     return res.redirect(`/admin/products/edit/${productId}?error=minImages`);
+    //   }
 
-      // Delete old images
-      if (existingProduct.images && existingProduct.images.length > 0) {
-        existingProduct.images.forEach(img => {
-          const imgPath = path.join(__dirname, '../public/uploads/products', img);
-          if (fs.existsSync(imgPath)) {
-            fs.unlinkSync(imgPath);
-          }
-        });
-      }
+    //   // Delete old images
+    //   if (existingProduct.images && existingProduct.images.length > 0) {
+    //     existingProduct.images.forEach(img => {
+    //       const imgPath = path.join(__dirname, '../public/uploads/products', img);
+    //       if (fs.existsSync(imgPath)) {
+    //         fs.unlinkSync(imgPath);
+    //       }
+    //     });
+    //   }
 
-      // Use resized image names from req.body.images
-      updatedFields.images = req.body.images;
-    } else {
-      updatedFields.images = existingProduct.images;
-    }
+    //   // Use resized image names from req.body.images
+    //   updatedFields.images = req.body.images;
+    // } else {
+    //   updatedFields.images = existingProduct.images;
+    // }
+
+
+    // Assuming you're using multer or similar and new images are in req.files
+if (req.files && req.files.length > 0) {
+  if (req.files.length < 3) {
+    return res.redirect(`/admin/products/edit/${productId}?error=minImages`);
+  }
+
+  // Delete old images
+  if (existingProduct.images && existingProduct.images.length > 0) {
+    existingProduct.images.forEach(img => {
+      const imgPath = path.join(__dirname, '../public/uploads/products', img);
+      if (fs.existsSync(imgPath)) {
+        fs.unlinkSync(imgPath);
+      }
+    });
+  }
+
+  // Save new images filenames from req.files
+  updatedFields.images = req.files.map(file => file.filename);
+
+} else {
+  // No new images uploaded, keep existing images
+  updatedFields.images = existingProduct.images;
+}
+
 
     // Update product in database
     await Product.findByIdAndUpdate(productId, updatedFields, { new: true });

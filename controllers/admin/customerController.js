@@ -80,7 +80,7 @@ const getUsers = async (req, res) => {
     try {
         const searchQuery = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
-        const limit = 3;
+        const limit = 10;
         const skip = (page - 1) * limit;
 
         const query = searchQuery

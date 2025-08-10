@@ -125,6 +125,7 @@ router.post("/cart/update-quantity/:id", userAuth, cartController.updateCartQuan
 
 router.get('/wishlist', userAuth,wishlistController.viewWishlist);
 router.get('/wishlist/add/:id', userAuth,wishlistController.addToWishlist);
+router.get('/wishlist/remove/:id', userAuth,wishlistController.removeFromWishlist);
 router.post('/wishlist/remove/:id', userAuth,wishlistController.removeFromWishlist);
 
 

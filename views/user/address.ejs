@@ -86,7 +86,7 @@
                             <ul>
                                 <li class="active"><a href="/">Home</a></li>
                                 <li class="has-dropdown">
-                                    <a href="/men">Men</a>
+                                    <!-- <a href="/men">Men</a> -->
                                     <ul class="dropdown">
                                         <li><a href="/product-detail">Product Detail</a></li>
                                         <li><a href="/cart">Shopping Cart</a></li>
@@ -95,10 +95,10 @@
                                         <li><a href="/wishlist">Wishlist</a></li>
                                     </ul>
                                 </li>
-                                <li><a href="/women">Women</a></li>
+                                <!-- <li><a href="/women">Women</a></li> -->
                                 <li><a href="/about">About</a></li>
                                 <li><a href="/contact">Contact</a></li>
-                                <li class="cart"><a href="/cart"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
+                                <li class="cart"><a href="/cart"><i class="icon-shopping-cart"></i> Cart</a></li>
         
 
                                 
@@ -154,12 +154,16 @@
         <a href="/profile" class="list-group-item list-group-item-action">
           <i class="fas fa-user"></i> Profile
         </a>
-        <a href="/orders" class="list-group-item list-group-item-action">
+        <a href="/my-orders" class="list-group-item list-group-item-action">
           <i class="fas fa-box"></i> Orders
         </a>
         <a href="/address" class="list-group-item list-group-item-action active" style="background-color: #339999; color: white;">
           <i class="fas fa-map-marker-alt"></i> Address
         </a>
+        <a href="/wallet" class="list-group-item list-group-item-action">
+          <i class="fas fa-wallet"></i> Wallet
+      </a>
+      
       </div>
     </div>
 
@@ -313,9 +317,12 @@
     </div>
 
 <!-- Modal for Editing Address -->
-<div class="modal fade" id="editAddressModal-<%= addr._id %>" tabindex="-1" aria-labelledby="editAddressModalLabel-<%= addr._id %>" aria-hidden="true">
+
+
+
+  <div class="modal fade" id="editAddressModal-<%= addr._id %>" tabindex="-1" aria-labelledby="editAddressModalLabel-<%= addr._id %>" aria-hidden="true">
     <div class="modal-dialog">
-      <form action="/address/edit/<%= addr._id %>" method="POST">
+      <form id="editAddressForm-<%= addr._id %>" action="/address/edit/<%= addr._id %>" method="POST" novalidate>
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="editAddressModalLabel-<%= addr._id %>">Edit Address</h5>
@@ -325,27 +332,48 @@
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label">Name *</label>
-              <input type="text" class="form-control" name="fullName" value="<%= addr.fullName %>" required>
+              <input type="text" class="form-control" id="edit-fullName-<%= addr._id %>" name="fullName" value="<%= addr.fullName %>">
+              <div class="text-danger small" id="edit-error1-<%= addr._id %>"></div>
             </div>
             <div class="mb-3">
               <label class="form-label">Mobile *</label>
-              <input type="tel" class="form-control" name="phone" value="<%= addr.phone %>" required>
+              <input type="tel" class="form-control" id="edit-phone-<%= addr._id %>" name="phone" value="<%= addr.phone %>">
+              <div class="text-danger small" id="edit-error2-<%= addr._id %>"></div>
             </div>
             <div class="mb-3">
               <label class="form-label">Pincode *</label>
-              <input type="text" class="form-control" name="pincode" value="<%= addr.pincode %>" required>
+              <input type="text" class="form-control" id="edit-pincode-<%= addr._id %>" name="pincode" value="<%= addr.pincode %>">
+              <div class="text-danger small" id="edit-error3-<%= addr._id %>"></div>
             </div>
+
+
+            <!-- <div class="mb-3">
+              <label class="form-label">State *</label>
+              <input type="text" class="form-control" id="edit-state-<%= addr._id %>" name="state" value="<%= addr.state %>">
+              <div class="text-danger small" id="edit-error4-<%= addr._id %>"></div>
+            </div> -->
+
             <div class="mb-3">
               <label class="form-label">State *</label>
-              <input type="text" class="form-control" name="state" value="<%= addr.state %>" required>
+              <input type="text" class="form-control" 
+                     id="edit-state-<%= addr._id %>" 
+                     name="state" 
+                     value="<%= addr.state %>" 
+                     pattern="[A-Za-z\s]+" 
+                     title="State name should only contain letters" 
+                     required>
+              <div class="text-danger small" id="edit-error4-<%= addr._id %>"></div>
             </div>
+            
             <div class="mb-3">
               <label class="form-label">City *</label>
-              <input type="text" class="form-control" name="city" value="<%= addr.city %>" required>
+              <input type="text" class="form-control" id="edit-city-<%= addr._id %>" name="city" value="<%= addr.city %>">
+              <div class="text-danger small" id="edit-error5-<%= addr._id %>"></div>
             </div>
             <div class="mb-3">
               <label class="form-label">Address *</label>
-              <textarea class="form-control" name="addressLine" required><%= addr.addressLine %></textarea>
+              <textarea class="form-control" id="edit-addressLine-<%= addr._id %>" name="addressLine"><%= addr.addressLine %></textarea>
+              <div class="text-danger small" id="edit-error6-<%= addr._id %>"></div>
             </div>
           </div>
   
@@ -357,10 +385,6 @@
       </form>
     </div>
   </div>
-  
-
-
-
 
 
   <% }) %>
@@ -373,9 +397,13 @@
 
 
 <!-- Add Address Modal -->
-<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+
+
+
+
+  <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <form action="/address/add" method="POST">
+      <form id="addAddressForm" action="/address/add" method="POST" novalidate>
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
@@ -384,28 +412,34 @@
   
           <div class="modal-body">
             <div class="mb-3">
-              <label for="fullName" class="form-label">Name *</label>
-              <input type="text" class="form-control" name="fullName" required>
+              <label class="form-label">Name *</label>
+              <input type="text" class="form-control" id="add-fullName" name="fullName">
+              <div class="text-danger small" id="add-error1"></div>
             </div>
             <div class="mb-3">
-              <label for="phone" class="form-label">Mobile *</label>
-              <input type="tel" class="form-control" name="phone" required>
+              <label class="form-label">Mobile *</label>
+              <input type="tel" class="form-control" id="add-phone" name="phone">
+              <div class="text-danger small" id="add-error2"></div>
             </div>
             <div class="mb-3">
-              <label for="pincode" class="form-label">Pincode *</label>
-              <input type="text" class="form-control" name="pincode" required>
+              <label class="form-label">Pincode *</label>
+              <input type="text" class="form-control" id="add-pincode" name="pincode">
+              <div class="text-danger small" id="add-error3"></div>
             </div>
             <div class="mb-3">
-              <label for="state" class="form-label">State *</label>
-              <input type="text" class="form-control" name="state" required>
+              <label class="form-label">State *</label>
+              <input type="text" class="form-control" id="add-state" name="state">
+              <div class="text-danger small" id="add-error4"></div>
             </div>
             <div class="mb-3">
-              <label for="city" class="form-label">City/District *</label>
-              <input type="text" class="form-control" name="city" required>
+              <label class="form-label">City/District *</label>
+              <input type="text" class="form-control" id="add-city" name="city">
+              <div class="text-danger small" id="add-error5"></div>
             </div>
             <div class="mb-3">
-              <label for="addressLine" class="form-label">Address (House No, Street, Area) *</label>
-              <textarea class="form-control" name="addressLine" required></textarea>
+              <label class="form-label">Address *</label>
+              <textarea class="form-control" id="add-addressLine" name="addressLine"></textarea>
+              <div class="text-danger small" id="add-error6"></div>
             </div>
           </div>
   
@@ -417,6 +451,7 @@
       </form>
     </div>
   </div>
+
 
 
 
@@ -544,6 +579,124 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
   <!-- Bootstrap JS (with Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+
+
+
+
+
+
+  <!-- Address Validation Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      
+      function setupAddressValidation(formId, prefix) {
+        const form = document.getElementById(formId);
+        const name = document.getElementById(prefix + "-fullName");
+        const phone = document.getElementById(prefix + "-phone");
+        const pincode = document.getElementById(prefix + "-pincode");
+        const state = document.getElementById(prefix + "-state");
+        const city = document.getElementById(prefix + "-city");
+        const addressLine = document.getElementById(prefix + "-addressLine");
+    
+        const error1 = document.getElementById(prefix + "-error1");
+        const error2 = document.getElementById(prefix + "-error2");
+        const error3 = document.getElementById(prefix + "-error3");
+        const error4 = document.getElementById(prefix + "-error4");
+        const error5 = document.getElementById(prefix + "-error5");
+        const error6 = document.getElementById(prefix + "-error6");
+    
+        function validateName() {
+          const pattern = /^[A-Za-z\s]+$/;
+          if (name.value.trim() === "") {
+            error1.innerHTML = "Please enter a valid name";
+          } else if (!pattern.test(name.value)) {
+            error1.innerHTML = "Name can only contain alphabets and spaces";
+          } else {
+            error1.innerHTML = "";
+          }
+        }
+    
+        function validatePhone() {
+          const pattern = /^[0-9]{10}$/;
+          if (!pattern.test(phone.value)) {
+            error2.innerHTML = "Enter a valid 10-digit mobile number";
+          } else {
+            error2.innerHTML = "";
+          }
+        }
+    
+        function validatePincode() {
+          const pattern = /^[0-9]{6}$/;
+          if (!pattern.test(pincode.value)) {
+            error3.innerHTML = "Enter a valid 6-digit pincode";
+          } else {
+            error3.innerHTML = "";
+          }
+        }
+    
+        function validateState() {
+  const pattern = /^[A-Za-z\s]+$/; // Only alphabets and spaces
+  if (state.value.trim() === "") {
+    error4.innerHTML = "State is required";
+  } else if (!pattern.test(state.value)) {
+    error4.innerHTML = "State can only contain alphabets";
+  } else {
+    error4.innerHTML = "";
+  }
+}
+
+function validateCity() {
+  const pattern = /^[A-Za-z\s]+$/; // Only alphabets and spaces
+  if (city.value.trim() === "") {
+    error5.innerHTML = "City is required";
+  } else if (!pattern.test(city.value)) {
+    error5.innerHTML = "City can only contain alphabets";
+  } else {
+    error5.innerHTML = "";
+  }
+}
+
+    
+        function validateAddress() {
+          if (addressLine.value.trim().length < 5) {
+            error6.innerHTML = "Please enter at least 5 characters";
+          } else {
+            error6.innerHTML = "";
+          }
+        }
+    
+        name.addEventListener("input", validateName);
+        phone.addEventListener("input", validatePhone);
+        pincode.addEventListener("input", validatePincode);
+        state.addEventListener("input", validateState);
+        city.addEventListener("input", validateCity);
+        addressLine.addEventListener("input", validateAddress);
+    
+        form.addEventListener("submit", function (e) {
+          validateName();
+          validatePhone();
+          validatePincode();
+          validateState();
+          validateCity();
+          validateAddress();
+    
+          if (error1.innerHTML || error2.innerHTML || error3.innerHTML || error4.innerHTML || error5.innerHTML || error6.innerHTML) {
+            e.preventDefault();
+          }
+        });
+      }
+    
+      // For Add Address
+      setupAddressValidation("addAddressForm", "add");
+    
+      // For Edit Address (multiple possible, so select all)
+      document.querySelectorAll("[id^='editAddressForm-']").forEach(form => {
+        const idSuffix = form.id.replace("editAddressForm-", "");
+        setupAddressValidation(form.id, "edit");
+      });
+    });
+    </script>
+    
 
 </body>
 </html>

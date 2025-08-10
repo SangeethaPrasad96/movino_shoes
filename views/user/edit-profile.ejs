@@ -159,12 +159,19 @@
                 <a href="/profile" class="list-group-item list-group-item-action active" style="background-color: #339999; color: white;">
                     <i class="fas fa-user"></i> Profile
                 </a>
-                <a href="/orders" class="list-group-item list-group-item-action">
+               
+
+                <a href="/my-orders" class="list-group-item list-group-item-action">
                     <i class="fas fa-box"></i> Orders
                 </a>
                 <a href="/address" class="list-group-item list-group-item-action">
                     <i class="fas fa-map-marker-alt"></i> Address
                 </a>
+
+                <a href="/wallet" class="list-group-item list-group-item-action">
+                    <i class="fas fa-wallet"></i> Wallet
+                </a>
+                
             </div>
         </div>
 
@@ -219,174 +226,41 @@
      </div>
                 <!-- 4.password                           -->
                                
-          <form id="changePasswordForm" method="POST">
-            <div class="form-group mt-4">
-                <label for="currentPassword">Current Password</label>
-                <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="newPassword">New Password</label>
-                <input type="password" id="newPassword" name="newPassword" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="confirmNewPassword">Confirm New Password</label>
-                <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary mt-2">Change Password</button>
-        </form>
+                <form id="changePasswordForm" method="POST">
+                    <div class="form-group mt-4">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+                        <small id="errorCurrent" class="text-danger" style="display:none;"></small>
+                    </div>
+                
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" class="form-control" required>
+                        <small id="errorNew" class="text-danger" style="display:none;"></small>
+                    </div>
+                
+                    <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="form-control" required>
+                        <small id="errorConfirm" class="text-danger" style="display:none;"></small>
+                    </div>
+                
+                    <button type="submit" class="btn btn-primary mt-2">Change Password</button>
+                </form>
+                
         
+
+
+
+
+
+      <!-- End of Edit Profile Section -->
+    </div> <!-- card-body -->
+</div> <!-- card -->
+</div> <!-- col-md-9 -->
+</div> <!-- row -->
+</div> <!-- container -->
         
-
-
-
-
-                                  
-
-
-
-         <script>
-
-
-// update name
-
-document.getElementById('updateNameBtn').addEventListener('click', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('name').value;
-
-    const response = await fetch('/update-name', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
-    });
-    const data = await response.json();
-
-    if (data.success) {
-        Swal.fire('Success', 'Name updated successfully!', 'success');
-        document.querySelector('.dropdown-link strong').innerText = data.updatedName;
-    } else {
-        Swal.fire('Error', 'Failed to update name. Try again.', 'error');
-    }
-});
-
-
-// Open Email Modal
-
-function openEmailModal() {
-    document.getElementById('emailModal').style.display = 'block';
-}
-
-function closeEmailModal() {
-    document.getElementById('emailModal').style.display = 'none';
-    document.getElementById('otpSection').style.display = 'none';
-}
-
-async function sendOTP() {
-    const email = document.getElementById('newEmail').value;
-    if (!email) return Swal.fire('Error', 'Enter a valid email.', 'error');
-
-    const response = await fetch('/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-        Swal.fire('Success', 'OTP sent!', 'success');
-        document.getElementById('otpSection').style.display = 'block';
-    } else {
-        Swal.fire('Error', data.message || 'Failed to send OTP', 'error');
-    }
-}
-
-async function verifyOTP() {
-    const email = document.getElementById('newEmail').value;
-    const otp = document.getElementById('otpInput').value;
-
-    const response = await fetch('/verify-email-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-    Swal.fire('Success', 'Email updated successfully!', 'success');
-    
-    // Update email in the visible DOM
-    const emailText = document.querySelector('p strong');
-    if (emailText) {
-        emailText.textContent = data.updatedEmail; // assuming backend returns updated email
-    }
-
-    closeEmailModal();
-}
-
-}
-
-
-
-
-
-
-
-    // password
-
-    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const currentPassword = document.getElementById('currentPassword').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
-    const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
-
-    if (!currentPassword || !newPassword || !confirmNewPassword) {
-        Swal.fire('Error', 'All password fields are required!', 'error');
-        return;
-    }
-
-    if (newPassword.length < 6) {
-        Swal.fire('Error', 'New password must be at least 6 characters long.', 'error');
-        return;
-    }
-
-    if (newPassword !== confirmNewPassword) {
-        Swal.fire('Error', 'New passwords do not match!', 'error');
-        return;
-    }
-
-    // Send to backend
-    try {
-        const response = await fetch('/change-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ currentPassword, newPassword })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            Swal.fire('Success', data.message, 'success').then(() => {
-                window.location.href = '/profile';
-            });
-        } else {
-            Swal.fire('Error', data.message, 'error');
-        }
-    } catch (error) {
-        Swal.fire('Error', 'Something went wrong. Please try again.', 'error');
-    }
-});
-
-
-
-
-
-
-
-    
-  
-</script>
 
 
 <!-- footer -->
@@ -497,6 +371,187 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 <script src="js/main.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+
+
+<script>
+
+    // update name
+    
+    document.getElementById('updateNameBtn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+    
+        const response = await fetch('/update-name', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        });
+        const data = await response.json();
+    
+        if (data.success) {
+            Swal.fire('Success', 'Name updated successfully!', 'success');
+            document.querySelector('.dropdown-link strong').innerText = data.updatedName;
+        } else {
+            Swal.fire('Error', 'Failed to update name. Try again.', 'error');
+        }
+    });
+    
+    
+    // Open Email Modal
+    
+    function openEmailModal() {
+        document.getElementById('emailModal').style.display = 'block';
+    }
+    
+    function closeEmailModal() {
+        document.getElementById('emailModal').style.display = 'none';
+        document.getElementById('otpSection').style.display = 'none';
+    }
+    
+    async function sendOTP() {
+        const email = document.getElementById('newEmail').value;
+        if (!email) return Swal.fire('Error', 'Enter a valid email.', 'error');
+    
+        const response = await fetch('/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+    
+        const data = await response.json();
+    
+        if (data.success) {
+            Swal.fire('Success', 'OTP sent!', 'success');
+            document.getElementById('otpSection').style.display = 'block';
+        } else {
+            Swal.fire('Error', data.message || 'Failed to send OTP', 'error');
+        }
+    }
+    
+    async function verifyOTP() {
+        const email = document.getElementById('newEmail').value;
+        const otp = document.getElementById('otpInput').value;
+    
+        const response = await fetch('/verify-email-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp })
+        });
+    
+        const data = await response.json();
+    
+        if (data.success) {
+        Swal.fire('Success', 'Email updated successfully!', 'success');
+        
+        // Update email in the visible DOM
+        const emailText = document.querySelector('p strong');
+        if (emailText) {
+            emailText.textContent = data.updatedEmail; // assuming backend returns updated email
+        }
+    
+        closeEmailModal();
+    }
+    
+    }
+    
+    
+    
+    
+    
+    
+    
+        // password
+    
+    
+       
+    document.addEventListener("DOMContentLoaded", function () {
+        const currentPass = document.getElementById("currentPassword");
+        const newPass = document.getElementById("newPassword");
+        const confirmPass = document.getElementById("confirmNewPassword");
+    
+        const errorCurrent = document.getElementById("errorCurrent");
+        const errorNew = document.getElementById("errorNew");
+        const errorConfirm = document.getElementById("errorConfirm");
+    
+        const form = document.getElementById("changePasswordForm");
+    
+        function validateCurrentPassword() {
+            if (currentPass.value.trim() === "") {
+                errorCurrent.style.display = "block";
+                errorCurrent.innerHTML = "Please enter your current password";
+            } else {
+                errorCurrent.style.display = "none";
+                errorCurrent.innerHTML = "";
+            }
+        }
+    
+        function validateNewPassword() {
+            const passVal = newPass.value.trim();
+            const alpha = /[a-zA-Z]/;
+            const digit = /\d/;
+    
+            if (passVal.length < 8) {
+                errorNew.style.display = "block";
+                errorNew.innerHTML = "Should contain at least 8 characters";
+            } else if (!alpha.test(passVal) || !digit.test(passVal)) {
+                errorNew.style.display = "block";
+                errorNew.innerHTML = "Should contain numbers and alphabets";
+            } else {
+                errorNew.style.display = "none";
+                errorNew.innerHTML = "";
+            }
+    
+            // Also check confirm field if already typed
+            if (confirmPass.value.trim() !== "") {
+                validateConfirmPassword();
+            }
+        }
+    
+        function validateConfirmPassword() {
+            if (newPass.value.trim() !== confirmPass.value.trim()) {
+                errorConfirm.style.display = "block";
+                errorConfirm.innerHTML = "Passwords do not match";
+            } else {
+                errorConfirm.style.display = "none";
+                errorConfirm.innerHTML = "";
+            }
+        }
+    
+        // Real-time validation
+        currentPass.addEventListener("input", validateCurrentPassword);
+        newPass.addEventListener("input", validateNewPassword);
+        confirmPass.addEventListener("input", validateConfirmPassword);
+    
+        // Final check on submit
+        form.addEventListener("submit", function (e) {
+            validateCurrentPassword();
+            validateNewPassword();
+            validateConfirmPassword();
+    
+            if (errorCurrent.innerHTML || errorNew.innerHTML || errorConfirm.innerHTML) {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+      
+    </script>
+
+
+
+
 
 
 

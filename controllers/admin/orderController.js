@@ -113,7 +113,7 @@ const updateOrderStatus = async (req, res) => {
 
 
 const verifyReturnRequest = async (req, res) => {
-  console.log("⚡ VERIFY RETURN FUNCTION HIT");
+ 
   try {
     const { orderId, itemId } = req.params;
     const { action } = req.body;  // ✅ Get accept/reject from body

@@ -1,22 +1,199 @@
-<h2>My Orders</h2>
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Movino_shoes</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<% if (orders.length === 0) { %>
-  <p>You haven’t placed any orders yet.</p>
-<% } else { %>
-  <table border="1" cellpadding="10" cellspacing="0">
-    <tr>
-      <th>Order ID</th>
-      <th>Date</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-    <% orders.forEach(order => { %>
-      <tr>
-        <td><%= order.orderId %></td>
-        <td><%= order.createdAt.toDateString() %></td>
-        <td><%= order.orderItems[0].status %></td>
-        <td><a href="/order/<%= order.orderId %>">View Details</a></td>
-      </tr>
-    <% }) %>
-  </table>
-<% } %>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet">
+
+    <!-- Icons & CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="css/icomoon.css">
+    <link rel="stylesheet" href="css/ionicons.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+    <link rel="stylesheet" href="css/flexslider.css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="fonts/flaticon/font/flaticon.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .list-group-item.active {
+            background-color: #339999 !important;
+            color: white !important;
+            border-color: #339999 !important;
+        }
+        .card-body img {
+            margin-bottom: 15px;
+        }
+        .btn-sm {
+            margin-right: 10px;
+        }
+        /* Make table cleaner */
+        .orders-table th, .orders-table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="colorlib-nav" role="navigation">
+        <div class="top-menu">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-sm-7 col-md-9">
+                        <div id="colorlib-logo"><a href="/">M O V I N O</a></div>
+                    </div>
+                    <div class="col-sm-5 col-md-3">
+                        <form action="#" class="search-wrap">
+                            <div class="form-group">
+                                <input type="search" class="form-control search" placeholder="Search">
+                                <button class="btn btn-primary submit-search" type="submit"><i class="icon-search"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-sm-12 text-left menu-1">
+                        <ul>
+                            <li class="active"><a href="/">Home</a></li>
+                            <li><a href="/about">About</a></li>
+                            <li><a href="/contact">Contact</a></li>
+                            <li class="cart"><a href="/cart"><i class="icon-shopping-cart"></i> Cart</a></li>
+                            <% if (user) { %>
+                                <li class="has-dropdown">
+                                    <a href="javascript:void(0);" class="dropdown-link"><strong><%= user.name %></strong></a>
+                                    <ul class="dropdown">
+                                        <li><a href="/profile">Profile</a></li>
+                                        <li><a href="/logout">Logout</a></li>
+                                    </ul>
+                                </li>
+                            <% } else { %>
+                                <li><a href="/login">Login</a></li>
+                                <li><a href="/signup">Signup</a></li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <div class="container">
+            <p class="bread"><span><a href="/">Home</a></span> / <span>Profile</span></p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-5 mb-5">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 text-center">
+                <img src="<%= user.profileImage || '/images/default-user.png' %>" 
+                     alt="User Image" 
+                     class="img-fluid rounded-circle" 
+                     style="width: 120px; height: 120px; object-fit: cover;">
+                <form action="/upload-profile-image" method="POST" enctype="multipart/form-data" class="mt-2">
+                    <label for="profileImage" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                    </label>
+                    <input type="file" name="profileImage" id="profileImage" style="display: none;" onchange="this.form.submit()" />
+                </form>
+
+                <!-- Sidebar Navigation -->
+                <div class="list-group mt-4">
+                    <!-- <a href="/profile" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-user"></i> Profile
+                    </a> -->
+					<a href="/profile" class="list-group-item list-group-item-action">
+						<i class="fas fa-user"></i> Profile
+					  </a>
+                    <!-- <a href="/my-orders" class="list-group-item list-group-item-action">
+                        <i class="fas fa-box"></i> Orders
+                    </a> -->
+					<a href="/my-orders" class="list-group-item list-group-item-action active" style="background-color: #339999; color: white;">
+						<i class="fas fa-map-marker-alt"></i> Orders
+					  </a>
+                    <a href="/address" class="list-group-item list-group-item-action">
+                        <i class="fas fa-map-marker-alt"></i> Address
+                    </a>
+                    <a href="/wallet" class="list-group-item list-group-item-action">
+                        <i class="fas fa-wallet"></i> Wallet
+                    </a>
+                </div>
+            </div>
+
+            <!-- Orders Section -->
+            <div class="col-md-9">
+                <h2>My Orders</h2>
+                <% if (orders.length === 0) { %>
+                    <p class="text-muted">You haven’t placed any orders yet.</p>
+                <% } else { %>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-striped table-hover orders-table">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach(order => { %>
+                                    <tr>
+                                        <td><%= order.orderId %></td>
+                                        <td><%= order.createdAt.toDateString() %></td>
+                                        <td><%= order.orderItems[0].status %></td>
+                                        <td>
+                                            <a href="/order/<%= order.orderId %>" class="btn btn-sm btn-info">
+                                                View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="colorlib-footer" role="contentinfo">
+        <div class="container">
+            <div class="row row-pb-md">
+                <!-- Footer content omitted for brevity -->
+            </div>
+        </div>
+    </footer>
+
+    <div class="gototop js-top">
+        <a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.easing.1.3.js"></script>
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <script src="/js/jquery.flexslider-min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/magnific-popup-options.js"></script>
+    <script src="/js/bootstrap-datepicker.js"></script>
+    <script src="/js/jquery.stellar.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

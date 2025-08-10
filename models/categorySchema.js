@@ -4,35 +4,7 @@ const {Schema} = mongoose;
 
 const categorySchema = new mongoose.Schema({
 
-    // categoryName:{
-        
-    //         type:String,
-    //         required:true,
-    //         unique:true
-    //     },
-        // description:{
-        //     type:String,
-        //     required:true,
-
-        // },
-        //category wise list and unlist
-        // isListed:{
-        //     type:Boolean,
-        //     default:true
-
-        // },
-        // categoryOffer:{
-        //     type:Number,
-        //     default:0
-        // },
-//         createdAt:{
-//             type:Date,
-//             default:Date.now
-//         }
-
-//     }
-// )
-// {
+    
     categoryName: {
       type: String,
       required: true,
@@ -50,11 +22,7 @@ const categorySchema = new mongoose.Schema({
       default: false,
     },
     isBlocked: { type: Boolean, default: false },
-    // status: {
-    //   type: String,
-    //   enum: ['listed', 'unlisted'],  // For listed and unlisted status
-    //   default: 'listed',  // Default to 'listed'
-    // },
+   
   },
   { timestamps: true } // for createdAt and updatedAt
 );

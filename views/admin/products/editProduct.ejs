@@ -22,9 +22,20 @@
         <div class="col-md-6">
           <label>Category</label>
           <select name="category" class="form-control" required>
-            <option value="">-- Select Category --</option>
-            <option value="Men" <%= product.category === 'Men' ? 'selected' : '' %>>Men</option>
-            <option value="Women" <%= product.category === 'Women' ? 'selected' : '' %>>Women</option>
+            <% 
+            const seen = new Set();
+            categories.forEach(category => {
+              if (!seen.has(category.categoryName)) {
+                seen.add(category.categoryName);
+          %>
+            <option value="<%= category._id %>" <%= String(product.category) === String(category._id) ? 'selected' : '' %>>
+              <%= category.categoryName %>
+            </option>
+          <% 
+              }
+            }); 
+          %>
+          
           </select>
         </div>
         <div class="col-md-6">
@@ -127,7 +138,9 @@
     });
   });
 
-  // On form submit, validate if 3+ new images selected
+ 
+
+  // On form submit, validate if 3+ new images selected only if images are provided
   form.addEventListener('submit', function(e) {
     const files = imageInput.files;
     if (files.length > 0 && files.length < 3) {

@@ -424,14 +424,12 @@ const getShopPage = async (req, res) => {
 const getProductDetail = async (req, res) => {
   try {
     const productId = req.params.id;
-  
-
     const product = await Product.findById(productId)
+   
     .populate('category')  // <<-- This is key to access isBlocked from category
     .lean();
 
-    // console.log("Product Details:", product);
-    // console.log("Category Details:", product.category); // populated category
+
     
 
     if (!product) {
@@ -441,8 +439,6 @@ const getProductDetail = async (req, res) => {
 
 
 
-// console.log("✅ Product:", product);
-// console.log("🔍 categoryId raw value:", product.category);
 
 // Check if categoryId is missing
 if (!product.category) {
@@ -450,7 +446,11 @@ if (!product.category) {
 }
 
 
-    res.render('product-detail', { product });
+    res.render('product-detail', { 
+      product ,
+      user: req.session.user || null,
+      error: req.query.error 
+    });
   } catch (err) {
     console.error("Error fetching product:", err);
     res.status(500).send("Internal Server Error");

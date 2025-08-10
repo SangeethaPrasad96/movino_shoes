@@ -113,8 +113,7 @@ router.get('/categories/recover/:id', adminAuth, async (req, res) => {
 
 
 
-router.post('/categories/block/:id', categoryController.blockCategory);
-router.post('/categories/unblock/:id', categoryController.unblockCategory);
+
 
 
 

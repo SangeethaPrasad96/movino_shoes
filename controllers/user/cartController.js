@@ -9,10 +9,6 @@ const Category = require('../../models/categorySchema');
 const loadCartPage = async (req, res) => {
     try {
         const userId = req.session.user._id;
-
-        // Fetch user's cart from the database
-        // const cart = await Cart.findOne({ userId }).populate("items.productId").lean();
-        // const cart = await Cart.findOne({ userId }).populate("items.productId", "name images").lean();
         const cart = await Cart.findOne({ userId })
     .populate("items.productId", "name images price") // Ensure price is populated
     .lean();
@@ -42,11 +38,9 @@ const addToCart = async (req, res) => {
     if (!req.session.user) {
         return res.status(401).send('Unauthorized: Please log in first.');//checking whether the user is login or not
       }
-
-
-
     const userId = req.session.user._id;
     const productId = req.params.id;
+    const from = req.query.from;
   
   
     const product = await Product.findById(productId).populate('category');
@@ -56,7 +50,17 @@ if (!product || product.isBlocked || product.category?.isBlocked) {
   return res.status(400).json({ success: false, message: "Product's category is blocked or unavailable." });
 }
 
-
+ // 🚨 New check: If stock is zero, don't add to cart
+ if (product.stock <= 0) {
+  
+    if (from === 'wishlist') {
+      
+        return res.redirect('/wishlist?error=outofstock');
+    } else {
+      
+        return res.redirect(`/product-detail/${productId}?error=outofstock`);
+    }
+}
 
     let cart = await Cart.findOne({ userId });
     if (!cart) {
@@ -82,8 +86,21 @@ if (!product || product.isBlocked || product.category?.isBlocked) {
     }
   
     await cart.save();
+
+  // ✅ Conditional redirect
+  if (from === 'product') {
     res.redirect('/cart');
-  };
+  } else {
+    res.redirect('/wishlist?cart=added');
+  }
+};
+
+
+    // res.redirect('/wishlist?cart=added');
+
+
+
+//   };
   
 
 

@@ -77,10 +77,12 @@ const getOrderCompletePage = async (req, res) => {
       .populate('orderItems.product');
 
     if (!order) {
-      return res.status(404).send('Order not found');
+      return res.status(404).send('Order not found1');
     }
 
-    res.render('order-complete', { order });
+    res.render('order-complete', { order,
+      user: req.session.user
+     });
   } catch (err) {
     console.error("Error loading order complete page:", err);
     res.status(500).send('Internal server error');
@@ -159,7 +161,7 @@ const getOrderCompletePage = async (req, res) => {
 // };
 
 const returnOrder = async (req, res) => {
-  console.log("⚡ VERIFY RETURN order FUNCTION HIT");
+
   try {
     const { reason } = req.body;
     const { orderId, itemId } = req.params;
@@ -167,11 +169,10 @@ const returnOrder = async (req, res) => {
     const order = await Order.findOne({ orderId });
 
 
-console.log("order id is" ,order)
-console.log("item id is" ,itemId)
+
 
     if (!order) {
-      return res.status(404).send('Order not found');
+      return res.status(404).send('Order not found2');
     }
 
     // Find the specific item inside the order
@@ -193,6 +194,7 @@ console.log("item id is" ,itemId)
 
     // Save the updated order
     await order.save();
+    
 
     return res.status(200).send('Return request submitted successfully');
   } catch (error) {
@@ -268,7 +270,7 @@ const getUserOrders = async (req, res) => {
     const orders = await Order.find({ user: userId })
       .sort({ createdAt: -1 }); // latest first
 
-    res.render('my-orders', { orders }); // adjust view path if needed
+    res.render('my-orders', { orders , user: req.session.user}); // adjust view path if needed
   } catch (err) {
     console.error("Error fetching user orders:", err);
     res.status(500).send("Internal Server Error");
@@ -315,13 +317,20 @@ const getUserOrders = async (req, res) => {
 // };
 
 const cancelOrderItem = async (req, res) => {
+
+
+
+
   try {
     const { orderId, itemId } = req.params;
     const reason = req.body.reason || 'No reason given';
+console.log("Incoming orderId2:", orderId);
 
-    // ✅ FIXED: Use findOne with orderId field instead of findById
-    const order = await Order.findOne({ orderId });
-    if (!order) return res.status(404).send('Order not found');
+   
+    // const order = await Order.findOne({ orderId });
+    const order = await Order.findById(orderId);
+
+    if (!order) return res.status(404).send('Order not found3');
 
     const item = order.orderItems.id(itemId);
     if (!item) return res.status(404).send('Item not found');
@@ -346,7 +355,7 @@ const cancelOrderItem = async (req, res) => {
     await order.save();
     
     // ✅ This is already correct - using order.orderId
-    res.redirect(`/order/${order.orderId}`);
+    res.redirect(`/order/${order.orderId}?cancelled=true`);
   } catch (err) {
     console.error("Error cancelling item:", err);
     res.status(500).send("Internal server error");
@@ -356,14 +365,16 @@ const cancelOrderItem = async (req, res) => {
 
 const getOrderDetails = async (req, res) => {
   try {
-    // console.log("Looking for orderId:", req.params.orderId); // ✅ Log inpu
+
+    const cancelled = req.query.cancelled === 'true';
+   
     const order = await Order.findOne({ orderId: req.params.orderId }).populate('orderItems.product');
 
     console.log("Order fetched from DB:", order); // ✅ Log result
 
-    if (!order) return res.status(404).send('Order not found');
+    if (!order) return res.status(404).send('Order not found4');
 
-    res.render('order-detail', { order });
+    res.render('order-detail', { order,cancelled });
   } catch (err) {
     console.error("Error loading order detail page:", err);
     res.status(500).send('Internal server error');

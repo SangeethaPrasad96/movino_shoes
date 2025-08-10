@@ -41,23 +41,59 @@ const addCategoryPage = (req, res) => {
 };
 
 // POST: Add Category
+// const addCategory = async (req, res) => {
+//   try {
+//     const { categoryName, subCategory } = req.body;
+//     const image = req.file ? req.file.filename : null;
+
+//     await Category.create({ categoryName, subCategory, image });
+
+//     req.flash('successMessage', 'Category added successfully!');
+//     res.redirect("/admin/categories"); // redirect back to form if you want to show alert here
+//   } catch (error) {
+//     console.error("Error adding category:", error);
+//     req.flash('errorMessage', 'Something went wrong!');
+//     res.redirect("/admin/categories/add");
+//   }
+// };
+
+
 const addCategory = async (req, res) => {
   try {
-    const { categoryName, subCategory } = req.body;
+    let { categoryName, subCategory } = req.body;
     const image = req.file ? req.file.filename : null;
 
-    await Category.create({ categoryName, subCategory, image });
+    // Normalize input
+    const normalizedCategory = categoryName.trim().toLowerCase();
+    const normalizedSubCategory = subCategory.trim().toLowerCase();
+
+    // Check if a similar category already exists (case-insensitive match)
+    const existingCategory = await Category.findOne({
+      categoryName: { $regex: new RegExp(`^${normalizedCategory}$`, 'i') },
+      subCategory: { $regex: new RegExp(`^${normalizedSubCategory}$`, 'i') }
+    });
+
+    if (existingCategory) {
+      req.flash('errorMessage', 'Category already exists!');
+      return res.redirect("/admin/categories/add");
+    }
+
+    // Save original case (or use .toUpperCase() if you want all caps)
+    await Category.create({
+      categoryName: categoryName.trim(),
+      subCategory: subCategory.trim(),
+      image
+    });
 
     req.flash('successMessage', 'Category added successfully!');
-    res.redirect("/admin/categories"); // redirect back to form if you want to show alert here
+    res.redirect("/admin/categories");
+
   } catch (error) {
     console.error("Error adding category:", error);
     req.flash('errorMessage', 'Something went wrong!');
     res.redirect("/admin/categories/add");
   }
 };
-
-
 
 
 const editCategoryPage = async (req, res) => {
@@ -153,32 +189,6 @@ const recoverCategory = async (req, res) => {
 
 
 
-// Block Category
-const blockCategory = async (req, res) => {
-  try {
-    const category = req.params.id;
-   
-    await Category.findByIdAndUpdate(category, { isBlocked: true });
-    res.redirect('/admin/categories');
-  } catch (err) {
-    console.error('Error blocking category:', err);
-    res.status(500).send('Internal Server Error');
-  }
-};
-
-// Unblock Category
-const unblockCategory = async (req, res) => {
-  try {
-    const category = req.params.id;
-
-    await Category.findByIdAndUpdate(category, { isBlocked: false });
-    res.redirect('/admin/categories');
-  } catch (err) {
-    console.error('Error unblocking category:', err);
-    res.status(500).send('Internal Server Error');
-  }
-};
-
 
 
 module.exports = {
@@ -190,8 +200,7 @@ module.exports = {
   softDeleteCategory,
   recoveryPage,
   recoverCategory,
-  blockCategory,
-  unblockCategory,
+
 
 
 };

@@ -1,13 +1,20 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-	<title>Footwear - Free Bootstrap 4 Template by Colorlib</title>
+	<title>Wishlist</title>
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet">
-	
+
+
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+
+
 	<!-- Animate.css -->
 	<link rel="stylesheet" href="css/animate.css">
 	<!-- Icomoon Icon Fonts-->
@@ -46,7 +53,7 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-sm-7 col-md-9">
-							<div id="colorlib-logo"><a href="index.html">Footwear</a></div>
+							<div id="colorlib-logo"><a href="/">M O V I N O</a></div>
 						</div>
 						<div class="col-sm-5 col-md-3">
 			            <form action="#" class="search-wrap">
@@ -60,9 +67,9 @@
 					<div class="row">
 						<div class="col-sm-12 text-left menu-1">
 							<ul>
-								<li><a href="index.html">Home</a></li>
+								<li><a href="/">Home</a></li>
 								<li class="has-dropdown active">
-									<a href="men.html">Men</a>
+									<!-- <a href="men.html">Men</a> -->
 									<ul class="dropdown">
 										<li><a href="product-detail.html">Product Detail</a></li>
 										<li><a href="cart.html">Shopping Cart</a></li>
@@ -71,10 +78,28 @@
 										<li><a href="add-to-wishlist.html">Wishlist</a></li>
 									</ul>
 								</li>
-								<li><a href="women.html">Women</a></li>
+								<!-- <li><a href="women.html">Women</a></li> -->
 								<li><a href="about.html">About</a></li>
 								<li><a href="contact.html">Contact</a></li>
-								<li class="cart"><a href="cart.html"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
+								<li class="cart"><a href="/cart"><i class="icon-shopping-cart"></i> Cart</a></li>
+
+
+								<% if (user) { %>  
+									<!-- User Dropdown -->
+									<li class="has-dropdown">
+										<a href="javascript:void(0);" class="dropdown-link"><%= user.name %></a>  
+										<ul class="dropdown">
+											<li><a href="/profile">Profile</a></li>  
+											<li><a href="/logout">Logout</a></li>  
+										</ul>
+									</li>
+								<% } else { %>  
+									<li><a href="/login">Login</a></li>
+									<li><a href="/signup">Signup</a></li>
+								<% } %>
+
+
+
 							</ul>
 						</div>
 					</div>
@@ -108,7 +133,7 @@
 			<div class="container">
 				<div class="row">
 					<div class="col">
-						<p class="bread"><span><a href="index.html">Home</a></span> / <span>My Wishlist</span></p>
+						<p class="bread"><span><a href="/">Home</a></span> / <span>My Wishlist</span></p>
 					</div>
 				</div>
 			</div>
@@ -117,7 +142,7 @@
 
 		<div class="colorlib-product">
 			<div class="container">
-				<div class="row row-pb-lg">
+				<!-- <div class="row row-pb-lg">
 					<div class="col-md-10 offset-md-1">
 						<div class="process-wrap">
 							<div class="process text-center active">
@@ -134,7 +159,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
+				</div> -->
 
 
 
@@ -149,6 +174,10 @@
 						<% wishlist.items.forEach(item => { 
 							 const product = item.productId;
 						%>
+
+
+						
+				  
 						  <div class="col-md-4 mb-4">
 							<div class="card position-relative">
 							  
@@ -159,15 +188,18 @@
 								&times;
 							  </a>
 				  
-							  <img src="/uploads/products/<%= product.images[0] %>" class="card-img-top" alt="<%= product.name %>">
+							  <!-- <img src="/uploads/products/<%= product.images[0] %>" class="card-img-top" alt="<%= product.name %>"> -->
+							  <a href="/product-detail/<%= product._id %>">
+								<img src="/uploads/products/<%= product.images[0] %>" class="card-img-top" alt="<%= product.name %>">
+							  </a>
 							  
 							  <div class="card-body text-center">
 								<h5 class="card-title"><%= product.name %></h5>
 								<p class="card-text">₹<%= product.price %></p>
 				  
 								<!-- Go to Bag button (adds to cart) -->
-								<form action="/cart/add/<%= product._id %>" method="POST">
-								  <button type="submit" class="btn text-white" style="background-color: #339999;">Go to Bag</button>
+								<form action="/cart/add/<%= product._id %>?from=wishlist" method="POST">
+								  <button type="submit" class="btn text-white" style="background-color: #339999;">Add to Cart</button>
 								</form>
 							  </div>
 							</div>
@@ -179,7 +211,11 @@
 					<% } %>
 				  </div>
 				  
-
+				  <% if (error === 'outofstock') { %>
+					<div class="alert alert-danger">
+					  Sorry, this product is currently <strong>Out of Stock</strong>.
+					</div>
+				  <% } %>
 
 <!-- 				
 				<div class="row row-pb-lg">
@@ -450,6 +486,60 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	<script src="js/jquery.stellar.min.js"></script>
 	<!-- Main -->
 	<script src="js/main.js"></script>
+
+
+
+	<script>
+		const urlParams = new URLSearchParams(window.location.search);
+		const removed = urlParams.get('removed');
+	    const cart = urlParams.get('cart');
+		const error = urlParams.get('error');
+
+
+
+
+		if (removed === 'true') {
+		  Swal.fire({
+			icon: 'success',
+			title: 'Product removed from wishlist',
+			showConfirmButton: false,
+			timer: 1500
+		  });
+
+		}
+
+		  if(cart === 'added'){
+			Swal.fire({
+			icon: 'success',
+			title: 'Product added to cart',
+			showConfirmButton: false,
+			timer: 1500
+		  });
+		  }
+	  
+		  // Optional: remove the query param from the URL after showing the alert
+		  if (removed || cart) {
+		  if (window.history.replaceState) {
+			const cleanUrl = window.location.href.split('?')[0];
+			window.history.replaceState(null, null, cleanUrl);
+		  }
+		}
+	
+
+
+	  </script>
+	  
+
+
+	  <script>
+		// Force full reload when user navigates back
+		window.addEventListener('pageshow', function (event) {
+		  if (event.persisted) {
+			window.location.reload();
+		  }
+		});
+	  </script>
+	  
 
 	</body>
 </html>

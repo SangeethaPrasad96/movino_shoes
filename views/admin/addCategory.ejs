@@ -1,48 +1,84 @@
 <%- include("../../views/partials/admin/header") %>
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <h3 class="text-center mb-4">Add New Category</h3>
 
-<div class="d-flex" style="min-height: 100vh;">
-  <!-- Sidebar is already included in header, so we focus on main content -->
-  <main class="flex-grow-1 d-flex justify-content-center align-items-center" style="background-color: #f9f9f9;">
-    <div class="container" style="max-width: 600px; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-      <h2 class="text-center mb-4">Add New Category</h2>
-      <form action="/admin/categories/add" method="POST" enctype="multipart/form-data">
+      <form id="addCategoryForm" action="/admin/categories/add" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
         <div class="mb-3">
-          <label for="categoryName" class="form-label">Category (Men/Women)</label>
-          <select class="form-control" name="categoryName" required>
-            <option value="">-- Select Category --</option>
-            <option value="Men">Men</option>
-            <option value="Women">Women</option>
-          </select>
+          <label for="categoryName" class="form-label">Category Name</label>
+          <input type="text" class="form-control" id="categoryName" name="categoryName" required>
+          <div class="invalid-feedback">Category name is required.</div>
         </div>
 
         <div class="mb-3">
-          <label for="subCategory" class="form-label">Subcategory</label>
-          <select class="form-control" name="subCategory" required>
-            <option value="">-- Select Subcategory --</option>
-            <option value="Sports">Sports</option>
-            <option value="Casual">Casual</option>
-            <option value="Formal">Formal</option>
-          </select>
+          <label for="subCategory" class="form-label">Subcategory Name</label>
+          <input type="text" class="form-control" id="subCategory" name="subCategory" required>
+          <div class="invalid-feedback">Subcategory name is required.</div>
         </div>
 
         <div class="mb-3">
           <label for="image" class="form-label">Category Image</label>
-          <input class="form-control" type="file" name="image" accept="image/*" required />
+          <input class="form-control" type="file" id="image" name="image" accept="image/*" required />
+          <div class="invalid-feedback">Please upload a category image.</div>
         </div>
 
+        <div id="imagePreview" class="mb-3 d-flex flex-wrap gap-2"></div>
+
         <div class="d-flex justify-content-between">
-          <button type="submit" class="btn btn-primary">Add Category</button>
-          <a href="/admin/categories" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary px-4">Add Category</button>
+          <a href="/admin/categories" class="btn btn-secondary px-4">Cancel</a>
         </div>
       </form>
     </div>
-  </main>
+  </div>
 </div>
 
+<script>
+  const form = document.getElementById("addCategoryForm");
+  const categoryNameInput = document.getElementById("categoryName");
+  const subCategoryInput = document.getElementById("subCategory");
+  const imageInput = document.getElementById("image");
+  const imagePreview = document.getElementById("imagePreview");
 
+  // Image preview
+  imageInput.addEventListener("change", () => {
+    imagePreview.innerHTML = '';
+    const file = imageInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.style.cssText = "height: 60px; width: 60px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc;";
+        imagePreview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Form validation with SweetAlert
+  form.addEventListener("submit", function (e) {
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+      form.classList.add("was-validated");
+      return;
+    }
+
+    if (!imageInput.files.length) {
+      e.preventDefault();
+      Swal.fire({
+        icon: "error",
+        title: "Image Required",
+        text: "Please upload a category image.",
+      });
+      return;
+    }
+  });
+</script>
 
 
 

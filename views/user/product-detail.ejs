@@ -53,7 +53,7 @@
 							<ul>
 								<li><a href="/">Home</a></li>
 								<li class="has-dropdown active">
-									<a href="men.html">Men</a>
+									<!-- <a href="men.html">Men</a> -->
 									<ul class="dropdown">
 										<li><a href="product-detail">Product Detail</a></li>
 										<li><a href="cart.html">Shopping Cart</a></li>
@@ -62,10 +62,31 @@
 										<li><a href="add-to-wishlist.html">Wishlist</a></li>
 									</ul>
 								</li>
-								<li><a href="women.html">Women</a></li>
+								<!-- <li><a href="women.html">Women</a></li> -->
 								<li><a href="about.html">About</a></li>
 								<li><a href="contact.html">Contact</a></li>
-								<li class="cart"><a href="cart.html"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
+							
+								<li class="cart"><a href="/cart"><i class="icon-shopping-cart"></i> Cart</a></li>
+									
+								<li class="cart"><a href="/wishlist"><i class="bi bi-heart"></i> Wishlist</a> </li>
+
+								<% if (user) { %>  
+									<!-- User Dropdown -->
+									<li class="has-dropdown">
+										<a href="javascript:void(0);" class="dropdown-link"><%= user.name %></a>  
+										<ul class="dropdown">
+											<li><a href="/profile">Profile</a></li>  
+											<li><a href="/logout">Logout</a></li>  
+										</ul>
+									</li>
+								<% } else { %>  
+									<li><a href="/login">Login</a></li>
+									<li><a href="/signup">Signup</a></li>
+								<% } %>
+
+
+
+
 							</ul>
 						</div>
 					</div>
@@ -166,8 +187,8 @@
 							<!-- <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.</p> -->
 							<div class="size-wrap">
 								<div class="block-26 mb-2">
-									<h4>Size</h4>
-				               <ul>
+									<!-- <h4>Size</h4> -->
+				               <!-- <ul>
 				                  <li><a href="#">7</a></li>
 				                  <li><a href="#">7.5</a></li>
 				                  <li><a href="#">8</a></li>
@@ -183,15 +204,15 @@
 				                  <li><a href="#">13</a></li>
 				                  <li><a href="#">13.5</a></li>
 				                  <li><a href="#">14</a></li>
-				               </ul>
+				               </ul> -->
 				            </div>
-				            <div class="block-26 mb-4">
+				            <!-- <div class="block-26 mb-4">
 									<h4>Width</h4>
 				               <ul>
 				                  <li><a href="#">M</a></li>
 				                  <li><a href="#">W</a></li>
 				               </ul>
-				            </div>
+				            </div> -->
 							</div>
                      <div class="input-group mb-4">
                      	<span class="input-group-btn">
@@ -217,7 +238,8 @@
 
 								
 									  
-									  <form action="/cart/add/<%= product._id %>" method="POST">
+									  <!-- <form action="/cart/add/<%= product._id %>" method="POST"> -->
+										<form action="/cart/add/<%= product._id %>?from=product" method="POST">
 										<button 
 										  type="submit" 
 										  class="btn btn-primary"
@@ -228,7 +250,12 @@
 									  </form>
 									  
 
-									
+									  <% if (error === 'outofstock') { %>
+										<div class="alert alert-danger">
+										  Sorry, this product is currently <strong>Out of Stock</strong>.
+										</div>
+									  <% } %>
+									  
 								</div>
 							</div>
 						</div>
@@ -540,6 +567,8 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 		    
 		});
 	</script>
+
+
 
 
 	</body>
