@@ -311,7 +311,7 @@ const getShopPage = async (req, res) => {
   
       // Pagination parameters
       const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 4; // Products per page
+      const limit = parseInt(req.query.limit) || 8; // Products per page
       const skip = (page - 1) * limit;
   
       // Build the query object for MongoDB
@@ -378,6 +378,8 @@ const getShopPage = async (req, res) => {
    let subCategories = [];
    if (selectedCategory) {
      const category = await Category.findOne({ name: selectedCategory });
+     
+     
      if (category) {
        subCategories = category.subCategories; // Assuming category has a 'subCategories' field
      }

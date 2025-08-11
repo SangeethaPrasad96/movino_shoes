@@ -71,13 +71,11 @@
                   <td>
                     <a href="/admin/products/edit/<%= p._id %>" class="btn btn-warning btn-sm">✏️ Edit</a>
                     <% if (!p.isDeleted) { %>
-                     
-
-
-
-                   
-                    <a href="/admin/products/delete/<%= p._id %>" class="btn btn-danger btn-sm">🗑️ Delete</a>
+                     <a href="/admin/products/delete/<%= p._id %>" class="btn btn-danger btn-sm">🗑️ Delete</a>
                     <% } %>
+  <!-- New button to add variants -->
+                    <!-- <a href="/admin/products/variants/<%= p._id %>" class="btn btn-info btn-sm">➕ Add Variant</a> -->
+                    <a href="/admin/products/<%= p._id %>/variants" class="btn btn-info btn-sm">View Variants</a>
 
                   </td>
                 </tr>

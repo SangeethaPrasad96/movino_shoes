@@ -92,7 +92,11 @@ const{ Schema }= mongoose;
     
     
 // }, { timestamps: true });
-
+const variantSchema = new mongoose.Schema({
+  size: { type: String, required: true },
+  price: { type: Number, required: true },  // Price for this size variant
+  quantity: { type: Number, required: true }, // Stock for this size variant
+});
 
 const productSchema = new mongoose.Schema({
   name:
@@ -136,7 +140,8 @@ const productSchema = new mongoose.Schema({
     type: String,
     enum: ['Active', 'Inactive'],
     default: 'Active'
-  }
+  },
+  variants: [variantSchema], 
 }, { timestamps: true });
 
 

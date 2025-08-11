@@ -145,6 +145,14 @@ router.get('/products/deleted', adminAuth, productController.viewDeletedProducts
 router.post('/products/recover/:id', adminAuth, productController.recoverProduct);
 
 
+//add variants
+// router.get('/products/variants/:id',adminAuth, productController.getVariantForm);
+// router.post('/products/variants/:id',adminAuth, productController.addVariants);
+
+router.get('/products/:id/variants', adminAuth, productController.getVariantForm);
+router.post('/products/:id/variants', adminAuth, productController.addVariants);
+
+
 
 
 

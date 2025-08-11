@@ -301,9 +301,55 @@ const searchProducts = async (req, res) => {
 
 
 
+const getVariantForm = async (req, res) => {
+  const productId = req.params.id;
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).send('Product not found');
+    }
+    res.render('products/variants', { product });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+};
 
 
 
+
+const addVariants = async (req, res) => {
+  const productId = req.params.id;
+  const { sizes, prices, quantities } = req.body;
+
+  if (!sizes || !prices || !quantities || !Array.isArray(sizes)) {
+    return res.status(400).send('Invalid input');
+  }
+
+  try {
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).send('Product not found');
+
+    // Build variants array from input arrays
+    const variants = sizes.map((size, index) => ({
+      size,
+      price: parseFloat(prices[index]),
+      quantity: parseInt(quantities[index], 10),
+    }));
+
+    product.variants = variants;
+
+    // Update total stock as sum of all variant quantities
+    product.stock = variants.reduce((acc, v) => acc + v.quantity, 0);
+
+    await product.save();
+
+    res.redirect('/admin/products');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+};
 
    
 
@@ -318,6 +364,8 @@ module.exports = {
   viewDeletedProducts,
   recoverProduct,
   searchProducts,
+  getVariantForm,
+  addVariants
 
   
 };
